@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Responsable\existencias\BajaIndex;
 use App\Http\Responsable\existencias\BajaStore;
 use App\Http\Responsable\existencias\StockMinimoIndex;
+use App\Http\Responsable\existencias\FechasVencimientoIndex;
 use App\Models\Baja;
 use App\Models\BajaDetalle;
 use App\Models\Producto;
 use App\Helpers\DatabaseConnectionHelper;
 use App\Models\Empresa;
 use Exception;
+use Carbon\Carbon;
 
 class ExistenciasController extends Controller
 {
@@ -245,6 +247,11 @@ class ExistenciasController extends Controller
     {
         return new StockMinimoIndex();
     }
+
+    public function fechasVencimientoIndex()
+    {
+        return new FechasVencimientoIndex();
+    }
     
     // ======================================================================
     // ======================================================================
@@ -264,16 +271,18 @@ class ExistenciasController extends Controller
 
         try {
             $productosStockMinimo = Producto::where('id_estado', 1)
-            ->whereColumn('cantidad', '<', 'stock_minimo')
-            ->count();
-
+                                            ->whereColumn('cantidad', '<', 'stock_minimo')
+                                            ->count();
             // Restaurar conexión principal si se usó tenant
-            if ($empresaActual) {
+            if ($empresaActual)
+            {
                 DatabaseConnectionHelper::restaurarConexionPrincipal();
             }
 
             // Devolver un JSON estructurado correctamente
-            return response()->json(['productos_bajo_stock' => $productosStockMinimo]);
+            return response()->json([
+                'productos_bajo_stock' => $productosStockMinimo
+            ]);
 
         } catch (Exception $e) {
             // Asegurar restauración de conexión principal en caso de error

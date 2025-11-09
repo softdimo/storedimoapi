@@ -159,6 +159,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('reporte_bajas_pdf', 'existencias\ExistenciasController@reporteBajasPdf');
     $router->get('stock_minimo_index', 'existencias\ExistenciasController@stockMinimoIndex');
     $router->get('alerta_stock_minimo', 'existencias\ExistenciasController@alertaStockMinimo');
+    
+    $router->get('alerta_fecha_vencimiento', 'existencias\ExistenciasController@alertaFechaVencimiento');    
+    $router->get('fechas_vencimiento_index', 'existencias\ExistenciasController@fechasVencimientoIndex');
 
     // ========================================================================
 
