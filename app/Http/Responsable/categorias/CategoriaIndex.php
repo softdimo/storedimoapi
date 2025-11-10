@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Categoria;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class CategoriaIndex implements Responsable
 {
@@ -24,12 +25,11 @@ class CategoriaIndex implements Responsable
         }
         
         try {
-            $categorias = Categoria::leftJoin('estados', 'estados.id_estado', '=', 'categorias.id_estado')
-            ->select(
-                'id_categoria',
-                'categoria',
-                'categorias.id_estado',
-                'estados.estado'
+            $categorias = Categoria::select(
+                    'id_categoria',
+                    'categoria',
+                    'categorias.id_estado',
+                    // 'estados.estado'
                 )
                 ->orderBy('categoria', 'ASC')
                 ->get();
@@ -38,6 +38,16 @@ class CategoriaIndex implements Responsable
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
+                }
+
+                foreach ($categorias as $categoria) {
+                    $estado = DB::connection('mysql')
+                        ->table('estados')
+                        ->where('id_estado', $categoria->id_estado)
+                        ->select('estado')
+                        ->first();
+    
+                    $categoria->estado = $estado->estado ?? 'Sin Estado';
                 }
 
                 return response()->json($categorias);
