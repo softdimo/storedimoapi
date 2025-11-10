@@ -25,15 +25,13 @@ class BajaIndex implements Responsable
         }
         
         try {
-            $bajas = Baja::leftjoin('estados','estados.id_estado','=','bajas.id_estado_baja')
-                // ->leftjoin('usuarios','usuarios.id_usuario','=','bajas.id_responsable_baja')
-                ->select(
+            $bajas = Baja::select(
                     'id_baja',
                     'id_responsable_baja',
                     // DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario, ' - ', identificacion) AS nombres_usuario"),
                     'fecha_baja',
                     'id_estado_baja',
-                    'estado'
+                    // 'estado'
                 )
                 ->orderByDesc('fecha_baja')
                 ->get();
@@ -43,16 +41,43 @@ class BajaIndex implements Responsable
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
-                 // 3. Agregar nombre completo del usuario desde la base principal
-                 foreach ($bajas as $baja) {
-                    $usuario = DB::connection('mysql') // o la conexión principal que uses
-                        ->table('usuarios')
-                        ->where('id_usuario', $baja->id_responsable_baja)
-                        ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
-                        ->first();
+                // 3. Agregar nombre completo del usuario y nombre estado desde la base principal
+                // Traer los catálogos completos en memoria
+                $usuarios = DB::connection('mysql')
+                    ->table('usuarios')
+                    ->select('id_usuario', DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
+                    ->get()
+                    ->keyBy('id_usuario');
 
-                    $baja->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($bajas as $baja) {
+                    $baja->nombres_usuario = $usuarios[$baja->id_responsable_baja]->nombres_usuario ?? 'Sin usuario';
+                    $baja->estado = $estados[$baja->id_estado_baja]->estado ?? 'Sin estado';
                 }
+
+                // foreach ($bajas as $baja) {
+                //     $usuario = DB::connection('mysql') // o la conexión principal que uses
+                //         ->table('usuarios')
+                //         ->where('id_usuario', $baja->id_responsable_baja)
+                //         ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
+                //         ->first();
+
+                //     $baja->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+
+                //     $estado = DB::connection('mysql') // o la conexión principal que uses
+                //         ->table('estados')
+                //         ->where('id_estado', $baja->id_estado_baja)
+                //         ->select('estado')
+                //         ->first();
+
+                //     $baja->estado = $estado->estado ?? 'Sin estado';
+                // }
 
                 return response()->json($bajas);
 
