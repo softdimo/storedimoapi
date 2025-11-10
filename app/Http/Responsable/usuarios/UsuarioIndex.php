@@ -7,6 +7,8 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Usuario;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
+
 
 class UsuarioIndex implements Responsable
 {
@@ -26,7 +28,7 @@ class UsuarioIndex implements Responsable
 
             $query = Usuario::leftjoin('roles', 'roles.id', '=', 'usuarios.id_rol')
                 ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
-                ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
+                // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
                 ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'usuarios.id_genero')
                 ->leftjoin('empresas', 'empresas.id_empresa', '=', 'usuarios.id_empresa')
@@ -36,7 +38,7 @@ class UsuarioIndex implements Responsable
                     'apellido_usuario',
                     'usuario',
                     'usuarios.id_tipo_documento',
-                    'tipo_documento',
+                    // 'tipo_documento',
                     'identificacion',
                     'email',
                     'name AS rol',
@@ -66,6 +68,17 @@ class UsuarioIndex implements Responsable
             // Restaurar conexión principal si se usó tenant
             if ($empresaActual) {
                 DatabaseConnectionHelper::restaurarConexionPrincipal();
+            }
+
+            // 3. Agregar nombre completo del usuario desde la base principal
+            foreach ($usuarios as $usuario) {
+                $tipoDocumento = DB::connection('mysql') // o la conexión principal que uses
+                    ->table('tipo_documento')
+                    ->where('id_tipo_documento', $usuario->id_tipo_documento)
+                    ->select('tipo_documento')
+                    ->first();
+
+                $usuario->tipo_documento = $tipoDocumento->tipo_documento ?? 'Sin Tipo de Documento';
             }
 
             return response()->json($usuarios);

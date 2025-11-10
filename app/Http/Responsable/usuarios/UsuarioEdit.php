@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioEdit implements Responsable
 {
@@ -40,7 +41,7 @@ class UsuarioEdit implements Responsable
         try {
             $usuario = Usuario::leftjoin('roles', 'roles.id', '=', 'usuarios.id_rol')
                 ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
-                ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
+                // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
                 ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'usuarios.id_genero')
                 ->leftjoin('empresas', 'empresas.id_empresa', '=', 'usuarios.id_empresa')
@@ -50,7 +51,7 @@ class UsuarioEdit implements Responsable
                     'apellido_usuario',
                     'usuario',
                     'usuarios.id_tipo_documento',
-                    'tipo_documento',
+                    // 'tipo_documento',
                     'identificacion',
                     'email',
                     'name AS rol',
@@ -77,6 +78,14 @@ class UsuarioEdit implements Responsable
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
+
+                $tipoDocumento = DB::connection('mysql')
+                        ->table('tipo_documento')
+                        ->where('id_tipo_documento', $usuario->id_tipo_documento)
+                        ->select('tipo_documento')
+                        ->first();
+                
+                $usuario->tipo_documento = $tipoDocumento->tipo_documento ?? 'Sin Tipo de Documento';
 
                 return response()->json($usuario);
                 
