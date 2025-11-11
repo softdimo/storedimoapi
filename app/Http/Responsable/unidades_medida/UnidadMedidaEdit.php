@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\UnidadMedida;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class UnidadMedidaEdit implements Responsable
 {
@@ -38,13 +39,12 @@ class UnidadMedidaEdit implements Responsable
         $idUmd = $this->idUmd;
 
         try {
-            $unidadMedida = UnidadMedida::leftJoin('estados', 'estados.id_estado', '=', 'unidades_medida.estado_id')
-                ->select(
+            $unidadMedida = UnidadMedida::select(
                     'id',
                     'descripcion',
                     'abreviatura',
                     'estado_id',
-                    'estado'
+                    // 'estado'
                 )
                 ->where('id', $idUmd)
                 ->first();
@@ -54,6 +54,15 @@ class UnidadMedidaEdit implements Responsable
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
+
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // 🔹 Asignar texto descriptivo al registro
+                $unidadMedida->estado = $estados[$unidadMedida->estado_id]->estado ?? 'Sin estado';
 
                 return response()->json($unidadMedida);
                 

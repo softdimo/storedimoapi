@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\UnidadMedida;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class UnidadMedidaIndex implements Responsable
 {
@@ -25,13 +26,12 @@ class UnidadMedidaIndex implements Responsable
         
         try
         {
-            $unidadesMedida = UnidadMedida::leftJoin('estados', 'estados.id_estado', '=', 'unidades_medida.estado_id')
-                ->select(
+            $unidadesMedida = UnidadMedida::select(
                     'id',
                     'descripcion',
                     'abreviatura',
                     'estado_id',
-                    'estado'
+                    // 'estado'
                 )
                 ->orderBy('descripcion', 'asc')
                 ->get();
@@ -42,6 +42,17 @@ class UnidadMedidaIndex implements Responsable
                 if ($empresaActual)
                 {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
+                }
+
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($unidadesMedida as $unidadMedida) {
+                    $unidadMedida->estado = $estados[$unidadMedida->estado_id]->estado ?? 'Sin estado';
                 }
 
                 return response()->json($unidadesMedida);
