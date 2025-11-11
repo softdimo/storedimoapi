@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Producto;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class ReporteProductosPdf implements Responsable
 {
@@ -25,7 +26,7 @@ class ReporteProductosPdf implements Responsable
         
         try {
             $reporteProductosPdf = Producto::leftJoin('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
-                ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
+                // ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
                 ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
                 ->select(
                     'id_producto',
@@ -38,7 +39,7 @@ class ReporteProductosPdf implements Responsable
                     'descripcion',
                     'stock_minimo',
                     'productos.id_estado',
-                    'estados.estado',
+                    // 'estados.estado',
                     'cantidad',
                     'tipo_persona.id_tipo_persona',
                     'tipo_persona',
@@ -52,6 +53,17 @@ class ReporteProductosPdf implements Responsable
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
+                }
+
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($reporteProductosPdf as $reporte) {
+                    $reporte->estado = $estados[$reporte->id_estado]->estado ?? 'Sin estado';
                 }
 
                 return response()->json($reporteProductosPdf);
