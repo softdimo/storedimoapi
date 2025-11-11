@@ -40,7 +40,7 @@ class UsuarioEdit implements Responsable
 
         try {
             $usuario = Usuario::leftjoin('roles', 'roles.id', '=', 'usuarios.id_rol')
-                ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
+                // ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
                 // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
                 ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'usuarios.id_genero')
@@ -56,7 +56,7 @@ class UsuarioEdit implements Responsable
                     'email',
                     'name AS rol',
                     'usuarios.id_rol',
-                    'estado',
+                    // 'estado',
                     'usuarios.id_estado',
                     'usuarios.id_tipo_persona',
                     'tipo_persona',
@@ -79,13 +79,34 @@ class UsuarioEdit implements Responsable
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
-                $tipoDocumento = DB::connection('mysql')
-                        ->table('tipo_documento')
-                        ->where('id_tipo_documento', $usuario->id_tipo_documento)
-                        ->select('tipo_documento')
-                        ->first();
+                // =========================================
+                // 🔹 Consultar catálogos (tipo_documento y estados)
+                // =========================================
+                $tiposDocumento = DB::connection('mysql')
+                    ->table('tipo_documento')
+                    ->select('id_tipo_documento', 'tipo_documento')
+                    ->get()
+                    ->keyBy('id_tipo_documento');
+
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // =========================================
+                // 🔹 Asignar valores al usuario (una sola vez)
+                // =========================================
+                $usuario->tipo_documento = $tiposDocumento[$usuario->id_tipo_documento]->tipo_documento ?? 'Sin Tipo de Documento';
+                $usuario->estado = $estados[$usuario->id_estado]->estado ?? 'Sin Estado';
+
+                // $tipoDocumento = DB::connection('mysql')
+                //         ->table('tipo_documento')
+                //         ->where('id_tipo_documento', $usuario->id_tipo_documento)
+                //         ->select('tipo_documento')
+                //         ->first();
                 
-                $usuario->tipo_documento = $tipoDocumento->tipo_documento ?? 'Sin Tipo de Documento';
+                // $usuario->tipo_documento = $tipoDocumento->tipo_documento ?? 'Sin Tipo de Documento';
 
                 return response()->json($usuario);
                 
