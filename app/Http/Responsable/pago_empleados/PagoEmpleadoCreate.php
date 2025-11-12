@@ -25,8 +25,8 @@ class PagoEmpleadoCreate implements Responsable
         
         try {
             $usuarios = Usuario::leftjoin('roles', 'roles.id', '=', 'usuarios.id_rol')
-                ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
-                ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
+                // ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
+                // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
                 ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'usuarios.id_genero')
                 ->select(
@@ -35,12 +35,12 @@ class PagoEmpleadoCreate implements Responsable
                     'apellido_usuario',
                     'usuario',
                     'usuarios.id_tipo_documento',
-                    'tipo_documento',
+                    // 'tipo_documento',
                     'identificacion',
                     'email',
                     'name AS rol',
                     'usuarios.id_rol',
-                    'estado',
+                    // 'estado',
                     'usuarios.id_estado',
                     'usuarios.id_tipo_persona',
                     'tipo_persona',

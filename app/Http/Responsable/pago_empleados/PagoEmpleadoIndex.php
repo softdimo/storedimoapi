@@ -25,10 +25,9 @@ class PagoEmpleadoIndex implements Responsable
         }
         
         try {
-            $pagoEmpleados = PagoEmpleado::leftjoin('estados','estados.id_estado','=','pago_empleados.id_estado')
-                ->leftjoin('usuarios','usuarios.id_usuario','=','pago_empleados.id_usuario')
+            $pagoEmpleados = PagoEmpleado::leftjoin('usuarios','usuarios.id_usuario','=','pago_empleados.id_usuario')
                 ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','usuarios.id_tipo_persona')
-                ->leftjoin('tipo_documento','tipo_documento.id_tipo_documento','=','usuarios.id_tipo_documento')
+                // ->leftjoin('tipo_documento','tipo_documento.id_tipo_documento','=','usuarios.id_tipo_documento')
                 ->leftjoin('tipos_pago','tipos_pago.id_tipo_pago','=','pago_empleados.id_tipo_pago')
                 ->leftjoin('periodos_pago','periodos_pago.id_periodo_pago','=','pago_empleados.id_periodo_pago')
                 ->select(
@@ -44,7 +43,7 @@ class PagoEmpleadoIndex implements Responsable
                     'tipo_persona.id_tipo_persona',
                     'tipo_persona',
                     'usuarios.id_tipo_documento',
-                    'tipo_documento',
+                    // 'tipo_documento',
                     'valor_ventas',
                     'valor_comision',
                     'periodos_pago.id_periodo_pago',
@@ -57,7 +56,7 @@ class PagoEmpleadoIndex implements Responsable
                     'salario_neto',
                     'valor_total',
                     'estados.id_estado',
-                    'estado'
+                    // 'estado'
                 )
                 ->orderByDesc('fecha_pago')
                 ->get();

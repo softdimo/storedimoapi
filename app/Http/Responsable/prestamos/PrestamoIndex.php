@@ -25,14 +25,13 @@ class PrestamoIndex implements Responsable
         }
         
         try {
-            $prestamos = Prestamo::leftjoin('estados','estados.id_estado','=','prestamos.id_estado_prestamo')
-                ->leftjoin('usuarios','usuarios.id_usuario','=','prestamos.id_usuario')
-                ->leftjoin('tipo_documento','tipo_documento.id_tipo_documento','=','usuarios.id_tipo_documento')
+            $prestamos = Prestamo::leftjoin('usuarios','usuarios.id_usuario','=','prestamos.id_usuario')
+                // ->leftjoin('tipo_documento','tipo_documento.id_tipo_documento','=','usuarios.id_tipo_documento')
                 ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','usuarios.id_tipo_persona')
                 ->select(
                     'id_prestamo',
                     'prestamos.id_estado_prestamo',
-                    'estado',
+                    // 'estado',
                     'prestamos.id_usuario',
                     DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) AS nombres_usuario"),
                     'valor_prestamo',
@@ -42,7 +41,7 @@ class PrestamoIndex implements Responsable
                     'fecha_limite',
                     'descripcion',
                     'usuarios.id_tipo_documento',
-                    'tipo_documento',
+                    // 'tipo_documento',
                     'usuarios.identificacion',
                     'usuarios.id_tipo_persona',
                     'tipo_persona'
