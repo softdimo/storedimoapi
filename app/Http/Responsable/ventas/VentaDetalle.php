@@ -37,7 +37,7 @@ class VentaDetalle implements Responsable
                 ->leftjoin('productos','productos.id_producto','=','ventas.id_producto')
                 ->leftjoin('personas','personas.id_persona','=','ventas.id_cliente')
                 // ->leftjoin('estados','estados.id_estado','=','ventas.id_estado_credito')
-                ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','ventas.id_tipo_cliente')
+                // ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','ventas.id_tipo_cliente')
                 ->leftjoin('empresas','empresas.id_empresa','=','ventas.id_empresa')
                 ->select(
                     'id_venta',
@@ -59,7 +59,7 @@ class VentaDetalle implements Responsable
                     'ventas.id_estado_credito',
                     // 'estado',
                     'id_tipo_cliente',
-                    'tipo_persona',
+                    // 'tipo_persona',
                     'empresas.id_empresa'
                 )
                 ->where('id_venta', $this->idVenta)
@@ -86,9 +86,16 @@ class VentaDetalle implements Responsable
                         ->get()
                         ->keyBy('id_estado');
 
+                    $tipoPersona = DB::connection('mysql')
+                        ->table('tipo_persona')
+                        ->select('id_tipo_persona', 'tipo_persona')
+                        ->get()
+                        ->keyBy('id_tipo_persona');
+
                     // Asignar datos correspondientes
                     $ventas->nombres_usuario = $usuarios[$ventas->id_usuario]->nombres_usuario ?? 'Sin usuario';
                     $ventas->estado = $estados[$ventas->id_estado_credito]->estado ?? 'Sin estado';
+                    $ventas->tipo_persona = $tipoPersona[$ventas->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
                 // if ($ventas) {

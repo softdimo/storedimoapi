@@ -30,7 +30,7 @@ class VentaIndex implements Responsable
                 ->leftjoin('personas','personas.id_persona','=','ventas.id_cliente')
                 // ->leftjoin('usuarios','usuarios.id_usuario','=','ventas.id_usuario')
                 // ->leftjoin('estados','estados.id_estado','=','ventas.id_estado_credito')
-                ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','ventas.id_tipo_cliente')
+                // ->leftjoin('tipo_persona','tipo_persona.id_tipo_persona','=','ventas.id_tipo_cliente')
                 ->leftjoin('empresas','empresas.id_empresa','=','ventas.id_empresa')
                 ->select(
                     'id_venta',
@@ -53,7 +53,7 @@ class VentaIndex implements Responsable
                     'ventas.id_estado_credito',
                     // 'estado',
                     'id_tipo_cliente',
-                    'tipo_persona',
+                    // 'tipo_persona',
                     'empresas.id_empresa'
                 )
                 ->orderByDesc('fecha_venta')
@@ -79,10 +79,17 @@ class VentaIndex implements Responsable
                     ->get()
                     ->keyBy('id_estado');
 
+                $tipoPersona = DB::connection('mysql')
+                    ->table('tipo_persona')
+                    ->select('id_tipo_persona', 'tipo_persona')
+                    ->get()
+                    ->keyBy('id_tipo_persona');
+
                 // 3. Agregar nombre completo del usuario y estado sin consultas por registro
                 foreach ($ventas as $venta) {
                     $venta->nombres_usuario = $usuarios[$venta->id_usuario]->nombres_usuario ?? 'Sin usuario';
                     $venta->estado = $estados[$venta->id_estado_credito]->estado ?? 'Sin estado';
+                    $venta->tipo_persona = $tipoPersona[$venta->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
                 // 3. Agregar nombre completo del usuario desde la base principal
