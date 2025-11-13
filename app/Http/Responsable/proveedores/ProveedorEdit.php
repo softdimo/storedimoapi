@@ -37,7 +37,7 @@ class ProveedorEdit implements Responsable
         
         try {
             $proveedor = Proveedor::leftjoin('empresas', 'empresas.id_empresa', '=', 'proveedores.id_empresa')
-                ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'proveedores.id_tipo_persona')
+                // ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'proveedores.id_tipo_persona')
                 // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'proveedores.id_tipo_documento')
                 // ->leftjoin('estados', 'estados.id_estado', '=', 'proveedores.id_estado')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'proveedores.id_genero')
@@ -46,7 +46,7 @@ class ProveedorEdit implements Responsable
                     'empresas.id_empresa',
                     'empresas.nombre_empresa',
                     'proveedores.id_tipo_persona',
-                    'tipo_persona',
+                    // 'tipo_persona',
                     'proveedores.id_tipo_documento',
                     // 'tipo_documento',
                     'identificacion',
@@ -94,9 +94,16 @@ class ProveedorEdit implements Responsable
                     ->get()
                     ->keyBy('id_estado');
 
+                $tipoPersona = DB::connection('mysql')
+                    ->table('tipo_persona')
+                    ->select('id_tipo_persona', 'tipo_persona')
+                    ->get()
+                    ->keyBy('id_tipo_persona');
+
                 // Asignar valores al proveedor
                 $proveedor->tipo_documento = $tipoDocumento[$proveedor->id_tipo_documento]->tipo_documento ?? 'Sin Tipo Documento';
                 $proveedor->estado = $estados[$proveedor->id_estado]->estado ?? 'Sin estado';
+                $proveedor->tipo_persona = $tipoPersona[$proveedor->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
             }
 
             return response()->json($proveedor);
