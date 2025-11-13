@@ -95,7 +95,7 @@ class VentaDetalle implements Responsable
                     // Asignar datos correspondientes
                     $ventas->nombres_usuario = $usuarios[$ventas->id_usuario]->nombres_usuario ?? 'Sin usuario';
                     $ventas->estado = $estados[$ventas->id_estado_credito]->estado ?? 'Sin estado';
-                    $ventas->tipo_persona = $tipoPersona[$ventas->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
+                    $ventas->tipo_persona = $tipoPersona[$ventas->id_tipo_cliente]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
                 // if ($ventas) {
