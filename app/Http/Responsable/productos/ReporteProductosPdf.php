@@ -27,7 +27,7 @@ class ReporteProductosPdf implements Responsable
         try {
             $reporteProductosPdf = Producto::leftJoin('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
                 // ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
-                ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
+                // ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
                 ->select(
                     'id_producto',
                     'nombre_producto',
@@ -41,8 +41,8 @@ class ReporteProductosPdf implements Responsable
                     'productos.id_estado',
                     // 'estados.estado',
                     'cantidad',
-                    'tipo_persona.id_tipo_persona',
-                    'tipo_persona',
+                    'productos.id_tipo_persona',
+                    // 'tipo_persona',
                     'referencia',
                     'fecha_vencimiento'
                 )
@@ -61,9 +61,16 @@ class ReporteProductosPdf implements Responsable
                     ->get()
                     ->keyBy('id_estado');
 
+                $tipoPersona = DB::connection('mysql')
+                    ->table('tipo_persona')
+                    ->select('id_tipo_persona', 'tipo_persona')
+                    ->get()
+                    ->keyBy('id_tipo_persona');
+
                 // Iterar las bajas sin hacer más consultas
                 foreach ($reporteProductosPdf as $reporte) {
                     $reporte->estado = $estados[$reporte->id_estado]->estado ?? 'Sin estado';
+                    $reporte->tipo_persona = $tipoPersona[$reporte->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
                 return response()->json($reporteProductosPdf);
