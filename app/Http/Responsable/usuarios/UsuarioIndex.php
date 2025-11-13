@@ -29,7 +29,7 @@ class UsuarioIndex implements Responsable
             $query = Usuario::leftjoin('roles', 'roles.id', '=', 'usuarios.id_rol')
                 // ->leftjoin('estados', 'estados.id_estado', '=', 'usuarios.id_estado')
                 // ->leftjoin('tipo_documento', 'tipo_documento.id_tipo_documento', '=', 'usuarios.id_tipo_documento')
-                ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
+                // ->leftjoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'usuarios.id_tipo_persona')
                 ->leftjoin('generos', 'generos.id_genero', '=', 'usuarios.id_genero')
                 ->leftjoin('empresas', 'empresas.id_empresa', '=', 'usuarios.id_empresa')
                 ->select(
@@ -46,7 +46,7 @@ class UsuarioIndex implements Responsable
                     // 'estado',
                     'usuarios.id_estado',
                     'usuarios.id_tipo_persona',
-                    'tipo_persona',
+                    // 'tipo_persona',
                     'generos.id_genero',
                     'genero',
                     'numero_telefono',
@@ -85,6 +85,12 @@ class UsuarioIndex implements Responsable
                 ->get()
                 ->keyBy('id_estado');
 
+            $tipoPersona = DB::connection('mysql')
+                ->table('tipo_persona')
+                ->select('id_tipo_persona', 'tipo_persona')
+                ->get()
+                ->keyBy('id_tipo_persona');
+
             // ====================================
             // 🔹 Recorrer los usuarios (una sola pasada)
             // ====================================
@@ -92,6 +98,7 @@ class UsuarioIndex implements Responsable
             foreach ($usuarios as $usuario) {
                 $usuario->tipo_documento = $tiposDocumento[$usuario->id_tipo_documento]->tipo_documento ?? 'Sin Tipo de Documento';
                 $usuario->estado = $estados[$usuario->id_estado]->estado ?? 'Sin Estado';
+                $usuario->tipo_persona = $tipoPersona[$usuario->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
             }
 
             // 3. Agregar nombre completo del usuario desde la base principal
