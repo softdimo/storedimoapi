@@ -1,56 +1,36 @@
 <?php
 
-namespace App\Http\Responsable\unidades_medida;
+namespace App\Http\Responsable\suscripciones;
 
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
-use App\Models\UnidadMedida;
-use App\Models\Empresa;
-use App\Helpers\DatabaseConnectionHelper;
+use App\Models\Suscripcion;
 
-class UnidadMedidaStore implements Responsable
+class SuscripcionStore implements Responsable
 {
     public function toResponse($request)
     {
-        // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
-        $empresaId = $request->input('empresa_actual');
-
-        // 2. Buscar empresa completa usando el ID
-        $empresaActual = Empresa::find($empresaId);
-        
-        // Configurar conexión tenant si hay empresa
-        if ($empresaActual) {
-            DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
-        }
-        
-        $descripcion = request('descripcion', null);
-        $abreviatura = request('abreviatura', null);
-        $estado_id = request('estado_id', null);
-
-        // ================================================
-
         try {
-            $nuevaUmd = UnidadMedida::create([
-                'descripcion' => $descripcion,
-                'abreviatura' => $abreviatura,
-                'estado_id' => $estado_id,
+            $nuevaSuscripcion = Suscripcion::create([
+                'id_empresa_suscrita'       => $request->input('id_empresa_suscrita'),
+                'id_plan_suscrito'          => $request->input('id_plan_suscrito'),
+                'dias_trial'                => $request->input('dias_trial'),
+                'id_tipo_pago_suscripcion'  => $request->input('id_tipo_pago_suscripcion'),
+                'valor_suscripcion'         => $request->input('valor_suscripcion'),
+                'fecha_inicial'             => $request->input('fecha_inicial'),
+                'fecha_final'               => $request->input('fecha_final'),
+                'id_estado_suscripcion'     => $request->input('id_estado_suscripcion'),
+                'fecha_cancelacion'         => $request->input('fecha_cancelacion'),
+                'renovacion_automatica'     => $request->input('renovacion_automatica', 0), // Default 0
+                'observaciones_suscripcion' => $request->input('observaciones_suscripcion'),
             ]);
-    
-            if (isset($nuevaUmd) && !is_null($nuevaUmd) && !empty($nuevaUmd)) {
-                // Restaurar conexión principal si se usó tenant
-                if ($empresaActual) {
-                    DatabaseConnectionHelper::restaurarConexionPrincipal();
-                }
 
+            if ($nuevaSuscripcion) {
                 return response()->json(['success' => true]);
             }
+
         } catch (Exception $e) {
-            // Asegurar restauración de conexión principal en caso de error
-            if (isset($empresaActual)) {
-                DatabaseConnectionHelper::restaurarConexionPrincipal();
-            }
-            
-            return response()->json(['error_bd' => $e->getMessage()]);
+            return response()->json(['error_bd' => $e->getMessage()], 500);
         }
     }
 }

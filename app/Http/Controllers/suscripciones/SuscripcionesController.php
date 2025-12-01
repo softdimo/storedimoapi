@@ -49,7 +49,7 @@ class SuscripcionesController extends Controller
      */
     public function store(Request $request)
     {
-        // return new SuscripcionStore();
+        return new SuscripcionStore();
     }
 
     // ======================================================================
