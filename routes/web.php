@@ -76,6 +76,8 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->post('suscripcion_store', 'suscripciones\SuscripcionesController@store');
     $router->get('suscripcion_edit/{idSuscripcion}', 'suscripciones\SuscripcionesController@edit');
     $router->put('suscripcion_update/{idSuscripcion}', 'suscripciones\SuscripcionesController@update');
+    $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
+    $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
 }); // FIN api/administracion
 
 // ========================================================================
