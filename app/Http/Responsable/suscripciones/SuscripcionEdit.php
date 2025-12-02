@@ -1,86 +1,58 @@
 <?php
 
-namespace App\Http\Responsable\unidades_medida;
+namespace App\Http\Responsable\suscripciones;
 
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Request;
-use App\Models\UnidadMedida;
-use App\Models\Empresa;
-use App\Helpers\DatabaseConnectionHelper;
-use Illuminate\Support\Facades\DB;
+use App\Models\Suscripcion;
 
-class UnidadMedidaEdit implements Responsable
+class SuscripcionEdit implements Responsable
 {
-    protected $idUmd;
+    protected $idSuscripcion;
 
     // =========================================
 
-    public function __construct($idUmd)
+    public function __construct($idSuscripcion)
     {
-        $this->idUmd = $idUmd;
+        $this->idSuscripcion = $idSuscripcion;
     }
 
     // =========================================
 
     public function toResponse($request)
     {
-        // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
-        $empresaId = $request->input('empresa_actual');
-
-        // 2. Buscar empresa completa usando el ID
-        $empresaActual = Empresa::find($empresaId);
-        
-        // Configurar conexión tenant si hay empresa
-        if ($empresaActual) {
-            DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
-        }
-        
-        $idUmd = $this->idUmd;
-
-        try {
-            $unidadMedida = UnidadMedida::select(
-                    'id',
-                    'descripcion',
-                    'abreviatura',
-                    'estado_id',
-                    // 'estado'
+        try
+        {
+            $suscripcion = Suscripcion::leftjoin('empresas', 'empresas.id_empresa', '=', 'suscripciones.id_empresa_suscrita')
+                ->leftjoin('planes', 'planes.id_plan', '=', 'suscripciones.id_plan_suscrito')
+                ->leftjoin('tipos_pago', 'tipos_pago.id_tipo_pago', '=', 'suscripciones.id_tipo_pago_suscripcion')
+                ->leftjoin('estados', 'estados.id_estado', '=', 'suscripciones.id_estado_suscripcion')
+                ->select(
+                    'id_suscripcion',
+                    'id_empresa_suscrita',
+                    'nombre_empresa',
+                    'id_plan_suscrito',
+                    'nombre_plan',
+                    'dias_trial',
+                    'id_tipo_pago_suscripcion',
+                    'tipo_pago as modalidad_suscripcion',
+                    'valor_suscripcion',
+                    'fecha_inicial',
+                    'fecha_final',
+                    'id_estado_suscripcion',
+                    'estado',
+                    'fecha_cancelacion',
+                    'renovacion_automatica',
+                    'observaciones_suscripcion'
                 )
-                ->where('id', $idUmd)
+                ->orderByDesc('id_suscripcion')
+                ->where('id_suscripcion', $this->idSuscripcion)
                 ->first();
 
-            if (isset($unidadMedida) && !is_null($unidadMedida) && !empty($unidadMedida)) {
-                // Restaurar conexión principal si se usó tenant
-                if ($empresaActual) {
-                    DatabaseConnectionHelper::restaurarConexionPrincipal();
-                }
-
-                $estados = DB::connection('mysql')
-                    ->table('estados')
-                    ->select('id_estado', 'estado')
-                    ->get()
-                    ->keyBy('id_estado');
-
-                // 🔹 Asignar texto descriptivo al registro
-                $unidadMedida->estado = $estados[$unidadMedida->estado_id]->estado ?? 'Sin estado';
-
-                return response()->json($unidadMedida);
-                
-            } else {
-                return response()->json([
-                    'message' => 'No existe producto'
-                ], 404);
-            }
-        } catch (Exception $e) {
-            // Asegurar restauración de conexión principal en caso de error
-            if (isset($empresaActual)) {
-                DatabaseConnectionHelper::restaurarConexionPrincipal();
-            }
+            return response()->json($suscripcion);
             
-            return response()->json([
-                'message' => 'Error consultando la Umd en BD',
-                'error' => $e->getMessage(),
-            ], 500);
+        } catch (Exception $e) {
+            return response()->json(['error_bd' => $e->getMessage()]);
         }
     }
 }

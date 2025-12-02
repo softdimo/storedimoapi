@@ -76,9 +76,9 @@ class SuscripcionesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($idProducto)
+    public function edit($idSuscripcion)
     {
-        // return new SuscripcionEdit($idProducto);
+        return new SuscripcionEdit($idSuscripcion);
     }
 
     // ======================================================================
