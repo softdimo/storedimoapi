@@ -1,24 +1,22 @@
 <?php
 
-namespace App\Http\Responsable\unidades_medida;
+namespace App\Http\Responsable\suscripciones;
 
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Responsable;
-use App\Models\Empresa;
-use App\Models\UnidadMedida;
-use App\Helpers\DatabaseConnectionHelper;
+use App\Models\Suscripcion;
 
 
-class UnidadMedidaUpdate implements Responsable
+class SuscripcionUpdate implements Responsable
 {
     protected $request;
-    protected $idUmd;
+    protected $idSuscripcion;
 
-    public function __construct(Request $request, $idUmd)
+    public function __construct(Request $request, $idSuscripcion)
     {
         $this->request = $request;
-        $this->idUmd = $idUmd;
+        $this->idSuscripcion = $idSuscripcion;
     }
 
     // ===================================================================
@@ -26,44 +24,28 @@ class UnidadMedidaUpdate implements Responsable
 
     public function toResponse($request)
     {
-        // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
-        $empresaId = $request->input('empresa_actual');
-
-        // 2. Buscar empresa completa usando el ID
-        $empresaActual = Empresa::find($empresaId);
-        
-        // Configurar conexión tenant si hay empresa
-        if ($empresaActual) {
-            DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
-        }
-        
         try {
-            $umd = UnidadMedida::find($this->idUmd);
+            $suscripcionUpdate = Suscripcion::find($this->idSuscripcion);
 
-            $umd->descripcion = $this->request->input('descripcion');
-            $umd->abreviatura = $this->request->input('abreviatura');
-            $umd->update();
-
-            // Restaurar conexión principal si se usó tenant
-            if ($empresaActual) {
-                DatabaseConnectionHelper::restaurarConexionPrincipal();
-            }
+            $suscripcionUpdate->id_plan_suscrito = $this->request->input('id_plan_suscrito');
+            $suscripcionUpdate->dias_trial = $this->request->input('dias_trial');
+            $suscripcionUpdate->id_tipo_pago_suscripcion = $this->request->input('id_tipo_pago_suscripcion');
+            $suscripcionUpdate->valor_suscripcion = $this->request->input('valor_suscripcion');
+            $suscripcionUpdate->fecha_inicial = $this->request->input('fecha_inicial');
+            $suscripcionUpdate->fecha_final = $this->request->input('fecha_final');
+            $suscripcionUpdate->id_estado_suscripcion = $this->request->input('id_estado_suscripcion');
+            $suscripcionUpdate->fecha_cancelacion = $this->request->input('fecha_cancelacion');
+            $suscripcionUpdate->renovacion_automatica = $this->request->input('renovacion_automatica');
+            $suscripcionUpdate->observaciones_suscripcion = $this->request->input('observacionesSuscripcion');
+            $suscripcionUpdate->update();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Unidad medida actualizada correctamente'
+                'message' => 'Suscripción actualizada correctamente'
             ]);
                 
         } catch (Exception $e) {
-            // Asegurar restauración de conexión principal en caso de error
-            if (isset($empresaActual)) {
-                DatabaseConnectionHelper::restaurarConexionPrincipal();
-            }
-            
-            return response()->json([
-                'message' => 'Error actualizando la Umd en BD',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['error_bd' => $e->getMessage()], 500);
         }
     }
 }
