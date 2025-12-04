@@ -78,6 +78,14 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->put('suscripcion_update/{idSuscripcion}', 'suscripciones\SuscripcionesController@update');
     $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
     $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
+
+    // ========================================================================
+
+    // PLANES
+    $router->get('plan_index', 'planes\PlanesController@index');
+    $router->post('plan_store', 'planes\PlanesController@store');
+    $router->get('plan_edit/{idPlan}', 'planes\PlanesController@edit');
+    $router->put('plan_update/{idPlan}', 'planes\PlanesController@update');
 }); // FIN api/administracion
 
 // ========================================================================
