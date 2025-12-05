@@ -5,18 +5,18 @@ namespace App\Http\Responsable\planes;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Responsable;
-use App\Models\Suscripcion;
+use App\Models\Plan;
 
 
 class PlanUpdate implements Responsable
 {
     protected $request;
-    protected $idSuscripcion;
+    protected $idPlan;
 
-    public function __construct(Request $request, $idSuscripcion)
+    public function __construct(Request $request, $idPlan)
     {
         $this->request = $request;
-        $this->idSuscripcion = $idSuscripcion;
+        $this->idPlan = $idPlan;
     }
 
     // ===================================================================
@@ -25,23 +25,20 @@ class PlanUpdate implements Responsable
     public function toResponse($request)
     {
         try {
-            $suscripcionUpdate = Suscripcion::find($this->idSuscripcion);
+            $planUpdate = Plan::find($this->idPlan);
 
-            $suscripcionUpdate->id_plan_suscrito = $this->request->input('id_plan_suscrito');
-            $suscripcionUpdate->dias_trial = $this->request->input('dias_trial');
-            $suscripcionUpdate->id_tipo_pago_suscripcion = $this->request->input('id_tipo_pago_suscripcion');
-            $suscripcionUpdate->valor_suscripcion = $this->request->input('valor_suscripcion');
-            $suscripcionUpdate->fecha_inicial = $this->request->input('fecha_inicial');
-            $suscripcionUpdate->fecha_final = $this->request->input('fecha_final');
-            $suscripcionUpdate->id_estado_suscripcion = $this->request->input('id_estado_suscripcion');
-            $suscripcionUpdate->fecha_cancelacion = $this->request->input('fecha_cancelacion');
-            $suscripcionUpdate->renovacion_automatica = $this->request->input('renovacion_automatica');
-            $suscripcionUpdate->observaciones_suscripcion = $this->request->input('observacionesSuscripcion');
-            $suscripcionUpdate->update();
+            $planUpdate->nombre_plan = $this->request->input('nombre_plan');
+            $planUpdate->valor_mensual = $this->request->input('valor_mensual');
+            $planUpdate->valor_trimestral = $this->request->input('valor_trimestral');
+            $planUpdate->valor_semestral = $this->request->input('valor_semestral');
+            $planUpdate->valor_anual = $this->request->input('valor_anual');
+            $planUpdate->descripcion_plan = $this->request->input('descripcion_plan');
+            $planUpdate->id_estado_plan = $this->request->input('id_estado_plan');
+            $planUpdate->update();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Suscripción actualizada correctamente'
+                'message' => 'Plan actualizado correctamente'
             ]);
                 
         } catch (Exception $e) {
