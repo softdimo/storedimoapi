@@ -293,7 +293,8 @@ class VentasController extends Controller
                                 ELSE precio_x_mayor_venta
                             END
                         , 0, 'de_DE')) as precio_venta_detalle
-                    ")
+                    "),
+                    DB::raw("CONCAT('$', FORMAT(ganancia_venta, 0, 'de_DE')) as ganancia_venta")
                 )
                 ->orderBy('nombre_producto')
                 ->get();

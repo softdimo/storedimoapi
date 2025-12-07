@@ -62,9 +62,11 @@ class VentaStore implements Responsable
                         'id_venta' => $idVenta,
                         'id_producto' => $producto['id_producto'],
                         'cantidad' => $producto['cantidad'],
+                        'precio_unitario_venta' => $producto['p_unitario'],
                         'precio_detal_venta' => $producto['p_detal'],
                         'precio_x_mayor_venta' => $producto['p_mayor'],
-                        'subtotal' => $producto['subtotal']
+                        'subtotal' => $producto['subtotal'],
+                        'ganancia_venta' => $producto['ganancia'],
                     ]);
 
                     $cantidadProducto = Producto::select('cantidad')
