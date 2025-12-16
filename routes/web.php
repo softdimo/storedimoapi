@@ -52,7 +52,6 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->post('guardar_permiso', 'roles_permisos\RolesPermisosController@crearPermiso');
     $router->post('crear_permiso_usuario', 'roles_permisos\RolesPermisosController@crearPermisosUsuario');
     $router->post('consultar_permisos', 'roles_permisos\RolesPermisosController@consultarPermisosPorUsuario');
-    // $router->post('eliminar_permiso_usuario', 'roles_permisos\RolesPermisosController@eliminarPermisosPorUsuario');
     $router->get('permisos_por_usuario_trait/{idUsuario}', 'roles_permisos\RolesPermisosController@permisosPorUsuarioTrait');
     $router->get('permisos_trait', 'roles_permisos\RolesPermisosController@permisosTrait');
     $router->get('permisos_view_share_trait', 'roles_permisos\RolesPermisosController@permisosViewShareTrait');
@@ -69,6 +68,24 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
 
     // Informes Gerenciales
     $router->post('informe_gerencial', 'informes\InformeController@index');
+
+    // ========================================================================
+
+    // SUSCRIPCIONES
+    $router->get('suscripcion_index', 'suscripciones\SuscripcionesController@index');
+    $router->post('suscripcion_store', 'suscripciones\SuscripcionesController@store');
+    $router->get('suscripcion_edit/{idSuscripcion}', 'suscripciones\SuscripcionesController@edit');
+    $router->put('suscripcion_update/{idSuscripcion}', 'suscripciones\SuscripcionesController@update');
+    $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
+    $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
+
+    // ========================================================================
+
+    // PLANES
+    $router->get('plan_index', 'planes\PlanesController@index');
+    $router->post('plan_store', 'planes\PlanesController@store');
+    $router->get('plan_edit/{idPlan}', 'planes\PlanesController@edit');
+    $router->put('plan_update/{idPlan}', 'planes\PlanesController@update');
 }); // FIN api/administracion
 
 // ========================================================================

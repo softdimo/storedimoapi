@@ -27,7 +27,7 @@ class EntradaIndex implements Responsable
         try {
             $entradas = Compra::leftjoin('proveedores','proveedores.id_proveedor','=','compras.id_proveedor')
                 ->leftjoin('productos','productos.id_producto','=','compras.id_producto')
-                ->leftjoin('estados','estados.id_estado','=','compras.id_estado')
+                // ->leftjoin('estados','estados.id_estado','=','compras.id_estado')
                 ->leftjoin('empresas','empresas.id_empresa','=','compras.id_empresa')
                 ->select(
                     'compras.id_compra',
@@ -43,7 +43,7 @@ class EntradaIndex implements Responsable
                     'empresas.id_empresa',
                     'empresas.nombre_empresa as empresa',
                     'compras.id_estado',
-                    'estado',
+                    // 'estado',
                     'compras.id_producto',
                     'nombre_producto',
                     'cantidad',
@@ -57,16 +57,36 @@ class EntradaIndex implements Responsable
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
-                // 3. Agregar nombre completo del usuario desde la base principal
-                foreach ($entradas as $entrada) {
-                    $usuario = DB::connection('mysql') // o la conexión principal que uses
-                        ->table('usuarios')
-                        ->where('id_usuario', $entrada->id_usuario)
-                        ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
-                        ->first();
+                // 3. Agregar nombre completo del usuario y nombre estado desde la base principal
+                // Traer los catálogos completos en memoria
+                $usuario = DB::connection('mysql')
+                    ->table('usuarios')
+                    ->select('id_usuario', DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
+                    ->get()
+                    ->keyBy('id_usuario');
 
-                    $entrada->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($entradas as $entrada) {
+                    $entrada->nombres_usuario = $usuario[$entrada->id_usuario]->nombres_usuario ?? 'Sin usuario';
+                    $entrada->estado = $estados[$entrada->id_estado]->estado ?? 'Sin estado';
                 }
+
+                // 3. Agregar nombre completo del usuario desde la base principal
+                // foreach ($entradas as $entrada) {
+                //     $usuario = DB::connection('mysql') // o la conexión principal que uses
+                //         ->table('usuarios')
+                //         ->where('id_usuario', $entrada->id_usuario)
+                //         ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
+                //         ->first();
+
+                //     $entrada->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+                // }
 
                 return response()->json($entradas);
 

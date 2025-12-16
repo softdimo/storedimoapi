@@ -213,7 +213,7 @@ class VentasController extends Controller
                 ->leftJoin('productos', 'productos.id_producto', '=', 'ventas.id_producto')
                 ->leftJoin('personas', 'personas.id_persona', '=', 'ventas.id_cliente')
                 ->leftJoin('usuarios', 'usuarios.id_usuario', '=', 'ventas.id_usuario')
-                ->leftJoin('estados', 'estados.id_estado', '=', 'ventas.id_estado_credito')
+                // ->leftJoin('estados', 'estados.id_estado', '=', 'ventas.id_estado_credito')
                 ->whereBetween('fecha_venta', [$fechaInicial, $fechaFinal])
                 ->whereIn('ventas.id_tipo_cliente', [5, 6]) // Filtra solo si hay una persona
                 ->select([
@@ -293,7 +293,8 @@ class VentasController extends Controller
                                 ELSE precio_x_mayor_venta
                             END
                         , 0, 'de_DE')) as precio_venta_detalle
-                    ")
+                    "),
+                    DB::raw("CONCAT('$', FORMAT(ganancia_venta, 0, 'de_DE')) as ganancia_venta")
                 )
                 ->orderBy('nombre_producto')
                 ->get();

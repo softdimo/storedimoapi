@@ -24,9 +24,11 @@ class VentaProducto extends Model implements Auditable
         'id_venta',
         'id_producto',
         'cantidad',
+        'precio_unitario_venta',
         'precio_detal_venta',
         'precio_x_mayor_venta',
-        'subtotal'
+        'subtotal',
+        'ganancia_venta'
     ];
 
     public function __construct(array $attributes = [])

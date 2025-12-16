@@ -4,8 +4,6 @@ namespace App\Http\Responsable\empresas;
 
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Empresa;
 
 class EmpresaIndex implements Responsable

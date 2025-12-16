@@ -8,6 +8,7 @@ use App\Models\Producto;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ProductoIndex implements Responsable
 {
@@ -27,8 +28,8 @@ class ProductoIndex implements Responsable
         try
         {
             $productos = Producto::leftJoin('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
-                ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
-                ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
+                // ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
+                // ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
                 ->join('unidades_medida', 'unidades_medida.id', '=', 'productos.id_umd')
                 ->leftJoin('proveedores', 'proveedores.id_proveedor', '=', 'productos.id_proveedor')
                 ->select(
@@ -46,10 +47,10 @@ class ProductoIndex implements Responsable
                     'proveedores.nombres_proveedor',
                     'stock_minimo',
                     'productos.id_estado',
-                    'estados.estado',
+                    // 'estados.estado',
                     'cantidad',
-                    'tipo_persona.id_tipo_persona',
-                    'tipo_persona',
+                    'productos.id_tipo_persona',
+                    // 'tipo_persona',
                     'referencia',
                     'fecha_vencimiento',
                     'unidades_medida.descripcion AS umd'
@@ -86,15 +87,25 @@ class ProductoIndex implements Responsable
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
-                // Retornar productos con su estado de vencimiento incluido
-                return response()->json($productos);
-            
-                // Restaurar conexión principal si se usó tenant
-                if ($empresaActual)
-                {
-                    DatabaseConnectionHelper::restaurarConexionPrincipal();
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                $tipoPersona = DB::connection('mysql')
+                    ->table('tipo_persona')
+                    ->select('id_tipo_persona', 'tipo_persona')
+                    ->get()
+                    ->keyBy('id_tipo_persona');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($productos as $producto) {
+                    $producto->estado = $estados[$producto->id_estado]->estado ?? 'Sin estado';
+                    $producto->tipo_persona = $tipoPersona[$producto->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
+                // Retornar productos con su estado de vencimiento incluido
                 return response()->json($productos);
             } else
             {
@@ -104,9 +115,18 @@ class ProductoIndex implements Responsable
             }
         } catch (Exception $e) {
             // Asegurar restauración de conexión principal en caso de error
-            if (isset($empresaActual))
-            {
+            if (isset($empresaActual)) {
                 DatabaseConnectionHelper::restaurarConexionPrincipal();
+            }
+
+            // 🧠 Si es un error SQL, mostrar información detallada
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                return response()->json([
+                    'message' => 'Error en la consulta SQL',
+                    'sql' => $e->getSql(),
+                    'bindings' => $e->getBindings(),
+                    'error' => $e->getMessage(),
+                ], 500);
             }
             
             return response()->json([

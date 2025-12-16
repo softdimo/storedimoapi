@@ -34,7 +34,7 @@ class DetalleEntrada implements Responsable
         try {
             $entradas = Compra::leftjoin('proveedores','proveedores.id_proveedor','=','compras.id_proveedor')
                 ->leftjoin('productos','productos.id_producto','=','compras.id_producto')
-                ->leftjoin('estados','estados.id_estado','=','compras.id_estado')
+                // ->leftjoin('estados','estados.id_estado','=','compras.id_estado')
                 ->leftjoin('empresas','empresas.id_empresa','=','compras.id_empresa')
                 ->select(
                     'compras.id_compra',
@@ -50,7 +50,7 @@ class DetalleEntrada implements Responsable
                     'empresas.id_empresa',
                     'empresas.nombre_empresa as empresa',
                     'compras.id_estado',
-                    'estado',
+                    // 'estado',
                     'compras.id_producto',
                     'nombre_producto',
                     'cantidad',
@@ -65,16 +65,42 @@ class DetalleEntrada implements Responsable
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
-                // 3. Agregar nombre completo del usuario desde la base principal
+                // ==============================
+                //   CONSULTAS EN BD PRINCIPAL
+                // ==============================
                 if ($entradas) {
-                    $usuario = DB::connection('mysql')
+                    // Obtener todos los usuarios (clave = id_usuario)
+                    $usuarios = DB::connection('mysql')
                         ->table('usuarios')
-                        ->where('id_usuario', $entradas->id_usuario)
-                        ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
-                        ->first();
-                
-                    $entradas->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+                        ->select(
+                            'id_usuario',
+                            DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario")
+                        )
+                        ->get()
+                        ->keyBy('id_usuario');
+
+                    // Obtener todos los estados (clave = id_estado)
+                    $estados = DB::connection('mysql')
+                        ->table('estados')
+                        ->select('id_estado', 'estado')
+                        ->get()
+                        ->keyBy('id_estado');
+
+                    // Asignar nombres amigables
+                    $entradas->nombres_usuario = $usuarios[$entradas->id_usuario]->nombres_usuario ?? 'Sin usuario';
+                    $entradas->estado = $estados[$entradas->id_estado]->estado ?? 'Sin estado';
                 }
+
+                // 3. Agregar nombre completo del usuario desde la base principal
+                // if ($entradas) {
+                //     $usuario = DB::connection('mysql')
+                //         ->table('usuarios')
+                //         ->where('id_usuario', $entradas->id_usuario)
+                //         ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
+                //         ->first();
+                
+                //     $entradas->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
+                // }
 
                 return response()->json($entradas);
 

@@ -309,14 +309,14 @@ class ExistenciasController extends Controller
 
         try {
             $baja = Baja::leftjoin('usuarios','usuarios.id_usuario','=','bajas.id_responsable_baja')
-                ->leftjoin('estados','estados.id_estado','=','bajas.id_estado_baja')
+                // ->leftjoin('estados','estados.id_estado','=','bajas.id_estado_baja')
                 ->select(
                     'id_baja',
                     'id_usuario',
                     DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario, ' - ', identificacion) AS nombres_usuario"),
                     'fecha_baja',
                     'id_estado_baja',
-                    'estado'
+                    // 'estado'
                 )
                 ->where('id_baja', $idBaja)
                 ->orderByDesc('fecha_baja')
@@ -325,6 +325,18 @@ class ExistenciasController extends Controller
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
+                }
+
+                // 🔹 Consulta directa a la base principal (mysql) para obtener los estados
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                // 🔹 Asignar el estado correspondiente al registro encontrado
+                if ($baja) {
+                    $baja->estado = $estados[$baja->id_estado_baja]->estado ?? 'Sin estado';
                 }
 
                 return response()->json($baja);

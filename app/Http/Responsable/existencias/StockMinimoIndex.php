@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Producto;
 use App\Helpers\DatabaseConnectionHelper;
 use App\Models\Empresa;
+use Illuminate\Support\Facades\DB;
 
 class StockMinimoIndex implements Responsable
 {
@@ -25,8 +26,8 @@ class StockMinimoIndex implements Responsable
         
         try {
             $productosStockMinimo = Producto::leftJoin('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
-                ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
-                ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
+                // ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
+                // ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
                 ->select(
                     'id_producto',
                     'nombre_producto',
@@ -39,10 +40,10 @@ class StockMinimoIndex implements Responsable
                     'stock_minimo',
                     'referencia',
                     'productos.id_estado',
-                    'estados.estado',
+                    // 'estados.estado',
                     'cantidad',
-                    'tipo_persona.id_tipo_persona',
-                    'tipo_persona'
+                    'productos.id_tipo_persona',
+                    // 'tipo_persona'
                 )
                 ->where('productos.id_estado', 1)
                 ->orderBy('nombre_producto', 'ASC')
@@ -53,6 +54,24 @@ class StockMinimoIndex implements Responsable
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
+                }
+
+                $estados = DB::connection('mysql')
+                    ->table('estados')
+                    ->select('id_estado', 'estado')
+                    ->get()
+                    ->keyBy('id_estado');
+
+                $tipoPersona = DB::connection('mysql')
+                    ->table('tipo_persona')
+                    ->select('id_tipo_persona', 'tipo_persona')
+                    ->get()
+                    ->keyBy('id_tipo_persona');
+
+                // Iterar las bajas sin hacer más consultas
+                foreach ($productosStockMinimo as $producto) {
+                    $producto->estado = $estados[$producto->id_estado]->estado ?? 'Sin estado';
+                    $producto->tipo_persona = $tipoPersona[$producto->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
                 }
 
                 return response()->json($productosStockMinimo);

@@ -235,7 +235,8 @@ class UsuariosController extends Controller
                 'nombre_usuario',
                 'apellido_usuario',
                 'name AS rol',
-                'logo_empresa'
+                'logo_empresa',
+                'nombre_empresa'
             )
             ->first();
 

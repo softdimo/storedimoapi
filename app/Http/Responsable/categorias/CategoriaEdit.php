@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Categoria;
 use App\Models\Empresa;
 use App\Helpers\DatabaseConnectionHelper;
+use Illuminate\Support\Facades\DB;
 
 class CategoriaEdit implements Responsable
 {
@@ -34,12 +35,11 @@ class CategoriaEdit implements Responsable
         }
         
         try {
-            $categoria = Categoria::leftJoin('estados', 'estados.id_estado', '=', 'categorias.id_estado')
-                ->select(
+            $categoria = Categoria::select(
                     'id_categoria',
                     'categoria',
                     'categorias.id_estado',
-                    'estados.estado'
+                    // 'estados.estado'
                 )
                 ->orderByDesc('categoria')
                 ->where('id_categoria', $this->idCategoria)
@@ -50,6 +50,14 @@ class CategoriaEdit implements Responsable
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
+
+                $estado = DB::connection('mysql')
+                        ->table('estados')
+                        ->where('id_estado', $categoria->id_estado)
+                        ->select('estado')
+                        ->first();
+                
+                $categoria->estado = $estado->estado ?? 'Sin Estado';
 
                 return response()->json($categoria);
             }
