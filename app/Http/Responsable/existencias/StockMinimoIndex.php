@@ -47,10 +47,11 @@ class StockMinimoIndex implements Responsable
                 )
                 ->where('productos.id_estado', 1)
                 ->orderBy('nombre_producto', 'ASC')
-                ->whereColumn('productos.cantidad', '<', 'productos.stock_minimo')
+                ->whereColumn('productos.cantidad', '<=', 'productos.stock_minimo')
                 ->get();
 
-            if (isset($productosStockMinimo) && !is_null($productosStockMinimo) && !empty($productosStockMinimo)) {
+            if (isset($productosStockMinimo) && !is_null($productosStockMinimo) && !empty($productosStockMinimo))
+            {
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
