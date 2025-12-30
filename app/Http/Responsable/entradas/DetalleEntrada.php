@@ -38,6 +38,7 @@ class DetalleEntrada implements Responsable
                 ->leftjoin('empresas','empresas.id_empresa','=','compras.id_empresa')
                 ->select(
                     'compras.id_compra',
+                    'factura_compra',
                     'fecha_compra',
                     DB::raw("CONCAT('$', FORMAT(valor_compra, 0, 'de_DE')) as valor_compra"),
                     'compras.id_proveedor',

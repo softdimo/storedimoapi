@@ -202,6 +202,7 @@ class EntradasController extends Controller
                 ->whereIn('proveedores.id_tipo_persona', [3, 4]) // Filtra solo si hay una persona
                 ->select([
                     'compras.id_compra',
+                    'compras.factura_compra',
                     'compras.fecha_compra',
                     'compras.valor_compra',
                     'proveedores.id_proveedor',
@@ -309,6 +310,7 @@ class EntradasController extends Controller
                 ->where('compras.id_compra', $idCompra)
                 ->select(
                     'compras.id_compra',
+                    'compras.factura_compra',
                     'compras.fecha_compra',
                     'compras.valor_compra',
                     'compras.id_proveedor',
