@@ -27,7 +27,8 @@ class Compra extends Model implements Auditable
         'id_proveedor',
         'id_producto',
         'id_usuario',
-        'id_estado'
+        'id_estado',
+        'motivo_anulacion'
     ];
 
     public function __construct(array $attributes = [])

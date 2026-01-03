@@ -129,12 +129,14 @@ class EntradasController extends Controller
     {
         // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
         $empresaId = $request->input('empresa_actual');
+        $motivo = $request->input('motivo');
 
         // 2. Buscar empresa completa usando el ID
         $empresaActual = Empresa::find($empresaId);
         
         // Configurar conexión tenant si hay empresa
-        if ($empresaActual) {
+        if ($empresaActual)
+        {
             DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
         }
 
@@ -142,17 +144,20 @@ class EntradasController extends Controller
 
         if (isset($compra) && !is_null($compra) && !empty($compra)) {
 
-            try {
+            try
+            {
                 $compra->id_estado = 2;
+                $compra->motivo_anulacion = $motivo;
                 $compra->update();
 
                 $productosCompra = CompraProducto::where('id_compra', $idCompra)->get();
 
-                foreach ($productosCompra as $item) {
-                
+                foreach ($productosCompra as $item)
+                {
                     $producto = Producto::find($item->id_producto);
                 
-                    if ($producto) {
+                    if ($producto)
+                    {
                         $nuevaCantidad = $producto->cantidad - $item->cantidad;
                         $producto->cantidad = max($nuevaCantidad, 0); // evita cantidades negativas
                         $producto->save();
@@ -176,9 +181,6 @@ class EntradasController extends Controller
             }
         }
     }
-
-    // ===================================================================
-    // ===================================================================
 
     public function reporteComprasPdf(Request $request)
     {
