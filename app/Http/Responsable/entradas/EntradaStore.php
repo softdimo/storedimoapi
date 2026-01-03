@@ -15,6 +15,7 @@ class EntradaStore implements Responsable
     public function toResponse($request)
     {
         $idEmpresa = request('id_empresa', null);
+        $facturaCompra = request('factura_compra', null);
         $fechaCompra = request('fecha_compra', null);
         $valorCompra = request('valor_compra', null);
         $idProveedor = request('id_proveedor', null);
@@ -36,6 +37,7 @@ class EntradaStore implements Responsable
 
             $crearCompra = Compra::create([
                 'id_empresa' => $idEmpresa,
+                'factura_compra' => $facturaCompra,
                 'fecha_compra' => $fechaCompra,
                 'valor_compra' => $valorCompra,
                 'id_proveedor' => $idProveedor,

@@ -22,6 +22,7 @@ class Compra extends Model implements Auditable
     public $timestamps = true;
     protected $fillable = [
         'id_empresa',
+        'factura_compra',
         'fecha_compra',
         'valor_compra',
         'id_proveedor',
