@@ -130,6 +130,8 @@ class EntradasController extends Controller
         // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
         $empresaId = $request->input('empresa_actual');
         $motivo = $request->input('motivo');
+        $fecha = $request->input('fechaAnulacion');
+        $usuario = $request->input('usuarioAnulacion');
 
         // 2. Buscar empresa completa usando el ID
         $empresaActual = Empresa::find($empresaId);
@@ -148,6 +150,8 @@ class EntradasController extends Controller
             {
                 $compra->id_estado = 2;
                 $compra->motivo_anulacion = $motivo;
+                $compra->fecha_anulacion_compra = $fecha;
+                $compra->usuario_anulacion = $usuario;
                 $compra->update();
 
                 $productosCompra = CompraProducto::where('id_compra', $idCompra)->get();
@@ -260,12 +264,16 @@ class EntradasController extends Controller
         try {
             $detalleCompra = CompraProducto::leftJoin('compras', 'compras.id_compra', '=', 'compra_productos.id_compra')
                 ->leftJoin('productos', 'productos.id_producto', '=', 'compra_productos.id_producto')
+                ->leftJoin('usuarios', 'usuarios.id_usuario', '=', 'compras.usuario_anulacion')
                 ->where('compra_productos.id_compra', $idCompra)
                 ->select(
                     'compra_productos.id_compra',
                     'compra_productos.id_producto',
                     'nombre_producto',
                     'compra_productos.cantidad',
+                    'compras.motivo_anulacion',
+                    DB::raw("DATE_FORMAT(FROM_UNIXTIME(compras.fecha_anulacion_compra), '%d-%m-%Y') AS fecha_anulacion"),
+                    DB::raw("CONCAT(usuarios.nombre_usuario, ' ', usuarios.apellido_usuario, ' - ', usuario) AS usuario_anulacion"),
                     DB::raw("CONCAT('$', FORMAT(precio_unitario_compra, 0, 'de_DE')) as precio_unitario_compra"),
                     DB::raw("CONCAT('$', FORMAT(subtotal, 0, 'de_DE')) as subtotal"),
                 )
