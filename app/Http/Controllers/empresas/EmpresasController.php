@@ -138,6 +138,8 @@ class EmpresasController extends Controller
         return new EmpresaDatosConexion($idEmpresa);
     }
 
+    // ======================================================================
+    // ======================================================================
     
     public function validar_nit(Request $request)
     {
@@ -165,4 +167,40 @@ class EmpresasController extends Controller
         }
     }
 
+    // ======================================================================
+    // ======================================================================
+
+    public function validarCorreoEmpresa(Request $request)
+    {
+        $correoEmpresa = $request->input('email_empresa');
+
+        try {
+            // $correoExiste = Empresa::select('email_empresa')->where('email_empresa', $correoEmpresa)->first();
+            $correoExiste = Empresa::where('email_empresa', $correoEmpresa)->first();
+
+            return response()->json($correoExiste);
+        
+
+            // if ($correoExiste) {
+            //     return response()->json([
+            //         'valido' => true,
+            //         'mensaje' => 'El correo ya está registrado.',
+            //         'correoEmpresa' => $correoExiste
+            //     ]);
+            // }
+
+            // return response()->json([
+            //     'valido' => false,
+            //     'mensaje' => 'El correo está disponible.'
+            // ]);
+        } catch (Exception $e) {
+            // dd($e);
+            // return response()->json([
+            //     'error_bd' => $e->getMessage(),
+            //     'valido' => false
+            // ], 500);
+
+            return response()->json(['error_bd' => $e->getMessage()], 500);
+        }
+    }
 }

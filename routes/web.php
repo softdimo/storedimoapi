@@ -65,6 +65,7 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->post('consultar_empresa', 'empresas\EmpresasController@consultarEmpresa');
     $router->get('empresa_edit/{idEmpresa}', 'empresas\EmpresasController@edit');
     $router->post('validar_nit', 'empresas\EmpresasController@validar_nit');
+    $router->post('validar_correo_empresa', 'empresas\EmpresasController@validarCorreoEmpresa');
 
     // Informes Gerenciales
     $router->post('informe_gerencial', 'informes\InformeController@index');
