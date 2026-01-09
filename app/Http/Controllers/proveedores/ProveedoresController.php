@@ -237,4 +237,21 @@ class ProveedoresController extends Controller
             return response()->json(['error_bd' => $e->getMessage()]);
         }
     }
+
+    // ======================================================================
+    // ======================================================================
+
+    public function validarCorreoProveedor(Request $request)
+    {
+        $correoProveedor = $request->input('email_proveedor');
+
+        try {
+            $correoExiste = Proveedor::where('email_proveedor', $correoProveedor)->first();
+
+            return response()->json($correoExiste);
+
+        } catch (Exception $e) {
+            return response()->json(['error_bd' => $e->getMessage()], 500);
+        }
+    }
 } // FIN clase ProveedoresController

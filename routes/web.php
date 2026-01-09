@@ -143,6 +143,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->put('proveedor_update/{idProveedor}', 'proveedores\ProveedoresController@update');
     $router->get('proveedor_edit/{idProveedor}', 'proveedores\ProveedoresController@edit');
     $router->get('proveedores_trait', 'proveedores\ProveedoresController@proveedoresTrait');
+    $router->post('validar_correo_proveedor', 'proveedores\ProveedoresController@validarCorreoProveedor');
 
     // ========================================================================
 
