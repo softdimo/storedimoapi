@@ -179,7 +179,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('stock_minimo_index', 'existencias\ExistenciasController@stockMinimoIndex');
     $router->get('alerta_stock_minimo', 'existencias\ExistenciasController@alertaStockMinimo');
     
-    $router->get('alerta_fecha_vencimiento', 'existencias\ExistenciasController@alertaFechaVencimiento');    
+    $router->get('alerta_fecha_vencimiento', 'existencias\ExistenciasController@alertaFechaVencimiento');
     $router->get('fechas_vencimiento_index', 'existencias\ExistenciasController@fechasVencimientoIndex');
 
     // ========================================================================
@@ -207,4 +207,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('unidad_medida_destroy/{idUmd}', 'unidades_medida\UnidadesMedidaController@destroy');
 
     // ========================================================================
+
+    // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
+    $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
 }); // api
