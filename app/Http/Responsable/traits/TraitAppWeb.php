@@ -47,7 +47,7 @@ class TraitAppWeb implements Responsable
                 'tipos_pago_ventas' => TipoPago::whereNotIn('id_tipo_pago', [4,5])->where('id_estado',1)->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
                 'tipos_pago_nomina' => TipoPago::whereIn('id_tipo_pago', [4,5])->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
                 'tipos_pago_suscripcion' => TipoPago::whereIn('id_tipo_pago', [6,7,8,9])->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
-                // 'periodos_pago' => PeriodoPago::orderBy('periodo_pago')->get(['periodo_pago', 'id_periodo_pago']),
+                'periodos_pago' => PeriodoPago::orderBy('periodo_pago')->get(['periodo_pago', 'id_periodo_pago']),
                 'porcentajes_comision' => PorcentajeComision::orderBy('porcentaje_comision')->get(['porcentaje_comision', 'id_porcentaje_comision']),
                 'empresas' => Empresa::orderBy('nombre_empresa')->where('id_estado', 1)->get(['nombre_empresa', 'id_empresa']),
                 'tipos_bd' => TipoBd::orderBy('tipo_bd')->get(['tipo_bd', 'id_tipo_bd']),
@@ -59,7 +59,6 @@ class TraitAppWeb implements Responsable
                                             ->where('id_estado', 1)
                                             ->get(['user', 'id_usuario']),
 
-
                 'tipos_cliente' => TipoPersona::whereIn('id_tipo_persona', [5,6])->orderBy('tipo_persona')->get(['tipo_persona', 'id_tipo_persona']),
 
                 // Para el get del select normal
@@ -70,7 +69,7 @@ class TraitAppWeb implements Responsable
 
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Error cargando configuración: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error cargando configuración Traits: ' . $e->getMessage()], 500);
         }
     }
 }
