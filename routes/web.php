@@ -87,6 +87,9 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->post('plan_store', 'planes\PlanesController@store');
     $router->get('plan_edit/{idPlan}', 'planes\PlanesController@edit');
     $router->put('plan_update/{idPlan}', 'planes\PlanesController@update');
+
+    // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
+    $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
 }); // FIN api/administracion
 
 // ========================================================================
@@ -210,4 +213,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
     $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
+    // $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
 }); // api

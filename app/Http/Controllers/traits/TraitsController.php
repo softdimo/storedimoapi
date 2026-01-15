@@ -111,4 +111,13 @@ class TraitsController extends Controller
         $getConfigIniciaTrait = new TraitAppWeb();
         return $getConfigIniciaTrait->getConfigInicial();
     }
+    
+    // ==========================================================================
+    // ==========================================================================
+
+    public function getEmpresasSuscripcion(Request $request, $id)
+    {
+        $getEmpresasSuscripcion = new TraitAppWeb();
+        return $getEmpresasSuscripcion->getEmpresasDisponiblesSuscripcion($id);
+    }
 } // FIN class TraitsController()

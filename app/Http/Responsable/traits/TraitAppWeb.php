@@ -28,6 +28,7 @@ class TraitAppWeb implements Responsable
     }
 
     // ========================================================
+    // ========================================================
 
     public function getConfigInicial()
     {
@@ -65,11 +66,51 @@ class TraitAppWeb implements Responsable
                 'planes' => Plan::orderBy('nombre_plan')->where('id_estado_plan', 1)->get(['nombre_plan', 'id_plan']),
 
                 // Para obtener TODOS los campos del plan en un arreglo indexado por id_plan
-                // 'planesData' => Plan::orderBy('nombre_plan')->get()->keyBy('id_plan'),
+                'planesData' => Plan::orderBy('nombre_plan')->get()->keyBy('id_plan'),
 
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => 'Error cargando configuración Traits: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // ========================================================
+    // ========================================================
+
+    public function getEmpresasDisponiblesSuscripcion($idEmpresaActual = null)
+    {
+        try {
+            // 1. IDs de empresas que YA tienen una suscripción
+            $empresasConSuscripcion = Suscripcion::whereNotNull('id_empresa_suscrita')
+                ->pluck('id_empresa_suscrita')
+                ->toArray();
+
+            $idsFijosAExcluir = [5];
+            $idsAExcluir = array_merge($empresasConSuscripcion, $idsFijosAExcluir);
+
+            // 4. Quitar de la exclusión si es edición
+            if ($idEmpresaActual && $idEmpresaActual != 'null') {
+                $idsAExcluir = array_diff($idsAExcluir, [$idEmpresaActual]);
+            }
+
+            // --- Consulta de Empresas Disponibles ---
+            $empresasDisponibles = Empresa::orderBy('nombre_empresa')
+                ->where('id_estado', 1)
+                ->whereNotIn('id_empresa', $idsAExcluir)
+                ->get(['nombre_empresa', 'id_empresa']);
+
+            // 5. REINCORPORADO: Si estamos en EDICIÓN, forzamos la inclusión de la empresa actual
+            if ($idEmpresaActual && $idEmpresaActual != 'null') {
+                $empresaActual = Empresa::where('id_empresa', $idEmpresaActual)
+                    ->get(['nombre_empresa', 'id_empresa']);
+                
+                // Unimos las colecciones
+                $empresasDisponibles = $empresasDisponibles->merge($empresaActual);
+            }
+
+            return response()->json($empresasDisponibles);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }
