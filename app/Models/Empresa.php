@@ -20,7 +20,9 @@ class Empresa extends Model implements Auditable
     protected $dates = ['deleted_at'];
     public $timestamps = true;
     protected $fillable = [
+        'id_tipo_documento',
         'nit_empresa',
+        'ident_empresa_natural',
         'nombre_empresa',
         'telefono_empresa',
         'celular_empresa',

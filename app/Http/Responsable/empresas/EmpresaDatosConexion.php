@@ -23,9 +23,13 @@ class EmpresaDatosConexion implements Responsable
         try {
             $empresa = Empresa::leftjoin('estados','estados.id_estado','=','empresas.id_estado')
                 ->leftjoin('tipos_bd','tipos_bd.id_tipo_bd','=','empresas.id_tipo_bd')
+                ->leftjoin('tipo_documento','tipo_documento.id_tipo_documento','=','empresas.id_tipo_documento')
                 ->select(
                     'id_empresa',
+                    'empresas.id_tipo_documento',
+                    'tipo_documento',
                     'nit_empresa',
+                    'ident_empresa_natural',
                     'nombre_empresa',
                     'telefono_empresa',
                     'celular_empresa',

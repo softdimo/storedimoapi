@@ -25,7 +25,9 @@ class EmpresaUpdate implements Responsable
         $empresa = Empresa::find($idEmpresa);
 
         try {
+            $empresa->id_tipo_documento = $this->request->input('id_tipo_documento');
             $empresa->nit_empresa = $this->request->input('nit_empresa');
+            $empresa->ident_empresa_natural = $this->request->input('ident_empresa_natural');
             $empresa->nombre_empresa = $this->request->input('nombre_empresa');
             $empresa->telefono_empresa = $this->request->input('telefono_empresa');
             $empresa->celular_empresa = $this->request->input('celular_empresa');
