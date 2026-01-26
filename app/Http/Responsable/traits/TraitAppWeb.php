@@ -40,13 +40,18 @@ class TraitAppWeb implements Responsable
                 'estados' => Estado::whereIn('id_estado', [1,2])->orderBy('estado')->get(['estado', 'id_estado']),
                 'estados_suscripciones' => Estado::whereIn('id_estado', [1,2,10,11,12])->orderBy('estado')->get(['estado', 'id_estado']),
                 'tipos_documento' => TipoDocumento::orderBy('tipo_documento')->get(['tipo_documento', 'id_tipo_documento']),
-                'tipos_documento_usuario' => TipoDocumento::whereNotIn('id_tipo_documento', [3])->orderBy('tipo_documento')->get(['tipo_documento', 'id_tipo_documento']),
+                'tipos_documento_usuario' => TipoDocumento::whereNotIn('id_tipo_documento', [3])
+                                                            ->orderBy('tipo_documento')
+                                                            ->get(['tipo_documento', 'id_tipo_documento']),
                 'tipos_persona' => TipoPersona::whereNotIn('id_tipo_persona', [1,2])->orderBy('tipo_persona')->get(['tipo_persona', 'id_tipo_persona']),
                 'tipos_empleado' => TipoPersona::whereIn('id_tipo_persona', [1,2])->orderBy('tipo_persona')->get(['tipo_persona', 'id_tipo_persona']),
                 'tipos_proveedor' => TipoPersona::whereIn('id_tipo_persona', [3,4])->orderBy('tipo_persona')->get(['tipo_persona', 'id_tipo_persona']),
                 'generos' => Genero::orderBy('genero')->get(['genero', 'id_genero']),
                 'tipos_baja' => TipoBaja::orderBy('tipo_baja','asc')->get(['tipo_baja', 'id_tipo_baja']),
-                'tipos_pago_ventas' => TipoPago::whereNotIn('id_tipo_pago', [4,5])->where('id_estado',1)->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
+                'tipos_pago_ventas' => TipoPago::whereIn('id_tipo_pago', [1,2])
+                                                ->where('id_estado',1)
+                                                ->orderBy('tipo_pago')
+                                                ->get(['tipo_pago', 'id_tipo_pago']),
                 'tipos_pago_nomina' => TipoPago::whereIn('id_tipo_pago', [4,5])->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
                 'tipos_pago_suscripcion' => TipoPago::whereIn('id_tipo_pago', [6,7,8,9])->orderBy('tipo_pago')->get(['tipo_pago', 'id_tipo_pago']),
                 'periodos_pago' => PeriodoPago::orderBy('periodo_pago')->get(['periodo_pago', 'id_periodo_pago']),
