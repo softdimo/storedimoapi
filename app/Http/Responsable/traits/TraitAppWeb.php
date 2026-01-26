@@ -36,6 +36,7 @@ class TraitAppWeb implements Responsable
             return response()->json([
 
                 'roles' => Roles::orderBy('name')->get(['name', 'id']),
+                'rolesTenant' => Roles::orderBy('name')->whereNotIn('id', [3,7,8])->get(['name', 'id']),
                 'estados' => Estado::whereIn('id_estado', [1,2])->orderBy('estado')->get(['estado', 'id_estado']),
                 'estados_suscripciones' => Estado::whereIn('id_estado', [1,2,10,11,12])->orderBy('estado')->get(['estado', 'id_estado']),
                 'tipos_documento' => TipoDocumento::orderBy('tipo_documento')->get(['tipo_documento', 'id_tipo_documento']),
