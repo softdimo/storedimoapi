@@ -28,8 +28,6 @@ class ProductoIndex implements Responsable
         try
         {
             $productos = Producto::leftJoin('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
-                // ->leftJoin('estados', 'estados.id_estado', '=', 'productos.id_estado')
-                // ->leftJoin('tipo_persona', 'tipo_persona.id_tipo_persona', '=', 'productos.id_tipo_persona')
                 ->join('unidades_medida', 'unidades_medida.id', '=', 'productos.id_umd')
                 ->leftJoin('proveedores', 'proveedores.id_proveedor', '=', 'productos.id_proveedor')
                 ->select(
@@ -44,13 +42,13 @@ class ProductoIndex implements Responsable
                     'precio_por_mayor',
                     'productos.descripcion',
                     'proveedores.id_proveedor',
-                    'proveedores.nombres_proveedor',
+                    // 'proveedores.nombres_proveedor',
+                    // 'proveedores.apellidos_proveedor',
+                    DB::raw("CONCAT(nombres_proveedor, ' ', apellidos_proveedor) AS nombres_proveedor"),
                     'stock_minimo',
                     'productos.id_estado',
-                    // 'estados.estado',
                     'cantidad',
                     'productos.id_tipo_persona',
-                    // 'tipo_persona',
                     'referencia',
                     'fecha_vencimiento',
                     'unidades_medida.descripcion AS umd'
