@@ -49,10 +49,12 @@ class ProductoEdit implements Responsable
                     'descripcion',
                     'proveedores.id_proveedor',
                     'proveedores.nombres_proveedor',
+                    'proveedores.apellidos_proveedor',
                     'stock_minimo',
                     'precio_unitario',
                     'precio_detal',
                     'precio_por_mayor',
+                    'cantidad',
                     'referencia',
                     'fecha_vencimiento',
                     'id_umd'
