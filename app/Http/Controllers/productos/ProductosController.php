@@ -535,4 +535,71 @@ class ProductosController extends Controller
             return response()->json(['error_bd' => $e->getMessage()]);
         }
     }
+
+    // ======================================================================
+    // ======================================================================
+
+    public function productosPorProveedor(Request $request, $idProveedor)
+    {
+        // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
+        $empresaId = $request->input('empresa_actual');
+
+        // 2. Buscar empresa completa usando el ID
+        $empresaActual = Empresa::find($empresaId);
+        
+        // Configurar conexión tenant si hay empresa
+        if ($empresaActual) {
+            DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
+        }
+
+        try
+        {
+            $productosPorProveedor = Producto::leftjoin('categorias','categorias.id_categoria','=','productos.id_categoria')
+                ->select(
+                    'id_producto',
+                    'id_empresa',
+                    'imagen_producto',
+                    'nombre_producto',
+                    'categorias.id_categoria',
+                    'categoria',
+                    'precio_unitario',
+                    'precio_detal',
+                    'precio_por_mayor',
+                    'descripcion',
+                    'stock_minimo',
+                    'categorias.id_estado',
+                    'tamano',
+                    'cantidad',
+                    'referencia',
+                    'fecha_vencimiento',
+                    'id_umd',
+                    'id_proveedor'
+                )
+                ->where('id_proveedor', $idProveedor)
+                ->get();
+
+            // Restaurar conexión principal si se usó tenant
+            if ($empresaActual)
+            {
+                DatabaseConnectionHelper::restaurarConexionPrincipal();
+            }
+
+            if ($productosPorProveedor)
+            {
+                return response()->json($productosPorProveedor);
+            }
+            //  else
+            // {
+            //     return response(null, 200);
+            // }
+
+        } catch (Exception $e) {
+            // Asegurar restauración de conexión principal en caso de error
+            if (isset($empresaActual)) {
+                DatabaseConnectionHelper::restaurarConexionPrincipal();
+            }
+            
+            return response()->json(['error_bd' => $e->getMessage()]);
+        }
+    }
 }

@@ -124,6 +124,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('productos_trait_ventas', 'productos\ProductosController@productosTraitVentas');
     $router->get('productos_trait_compras', 'productos\ProductosController@productosTraitCompras');
     $router->get('productos_trait_existencias', 'productos\ProductosController@productosTraitExistencias');
+    $router->get('productos_por_proveedor/{idProveedor}', 'productos\ProductosController@productosPorProveedor');
 
     // ========================================================================
 
