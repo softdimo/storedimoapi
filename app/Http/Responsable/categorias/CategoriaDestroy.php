@@ -40,12 +40,38 @@ class CategoriaDestroy implements Responsable
 
         $categoria = Categoria::where('id_categoria', $idCategoria)->first();
 
-        $idEstado = $categoria->id_estado;
+        if (!$categoria) {
+            return response()->json(['error_bd' => 'Categoría no encontrada'], 404);
+        }
 
         try {
-            if ($idEstado == 1) {
+            // --- NUEVA VALIDACIÓN ---
+            // Si intentamos pasar de Activo (1) a Inactivo (2)
+            if ($categoria->id_estado == 1) {
+                
+                // Verificamos si existen productos vinculados.
+                // Asumiendo que el modelo Categoria tiene la relación 'productos'
+                // o consultando directamente la tabla:
+                $tieneProductos = DB::connection('tenant') // Asegura que use la conexión del tenant
+                                    ->table('productos')
+                                    ->where('id_categoria', $idCategoria)
+                                    ->exists();
+
+                if ($tieneProductos) {
+                    if ($empresaActual) {
+                        DatabaseConnectionHelper::restaurarConexionPrincipal();
+                    }
+                    
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No se puede inactivar: La categoría tiene productos asociados.'
+                    ], 400);
+                }
+
                 $categoria->id_estado = 2;
+
             } else {
+                // Si está inactiva, la activamos sin restricciones
                 $categoria->id_estado = 1;
             }
 
@@ -57,7 +83,6 @@ class CategoriaDestroy implements Responsable
             }
             
             return response()->json(['success' => true]);
-            
 
         } catch (Exception $e) {
             // Asegurar restauración de conexión principal en caso de error
