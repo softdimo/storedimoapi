@@ -12,6 +12,7 @@ use App\Http\Responsable\usuarios\UsuarioUpdate;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 
 class UsuariosController extends Controller
@@ -264,17 +265,26 @@ class UsuariosController extends Controller
         return response()->json($user);
     }
 
-    // public function actualizarTokenSesion(Request $request, $idUsuario)
-    // {
-    //     try {
-    //         Usuario::where('id_usuario', $idUsuario)->update(['session_token' => $request->session_token]);
+    public function consultarSessionToken($idUsuario)
+    {
+        try {
+            $sessionTokenUser = DB::connection('mysql')
+                                ->table('usuarios')
+                                ->select('session_token')
+                                ->where('id_usuario', $idUsuario)
+                                ->first();
             
-    //         return response()->json(true);
+            // Si el usuario no existe, devolvemos un token nulo claramente
+            if (!$sessionTokenUser) {
+                return response()->json(['session_token' => null], 404);
+            }
 
-    //     } catch (Exception $e) {
-    //         return response()->json(['error_bd' => $e->getMessage()]);
-    //     }
-    // }
+            return response()->json($sessionTokenUser);
+
+        } catch (Exception $e) {
+            return response()->json(['error_bd' => $e->getMessage()], 500);
+        }
+    }
 
     public function actualizarTokenSesion(Request $request, $idUsuario)
     {
