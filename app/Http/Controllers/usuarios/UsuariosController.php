@@ -11,6 +11,7 @@ use App\Http\Responsable\usuarios\UsuarioEdit;
 use App\Http\Responsable\usuarios\UsuarioUpdate;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
+use Illuminate\Support\Str;
 
 
 class UsuariosController extends Controller
@@ -142,19 +143,39 @@ class UsuariosController extends Controller
     }
 
 
+    // public function cambiarClave(Request $request, $idUsuario)
+    // {
+    //     $claveNueva = request('clave', null);
+
+    //     try {
+    //         Usuario::where('id_usuario',$idUsuario)
+    //             ->update([
+    //                 'clave' => Hash::make($claveNueva),
+    //         ]);
+    //         return response()->json(true);
+
+    //     } catch (Exception $e) {
+    //         return response()->json(['error_bd' => $e->getMessage()]);
+    //     }
+    // }
+
     public function cambiarClave(Request $request, $idUsuario)
     {
         $claveNueva = request('clave', null);
 
         try {
-            Usuario::where('id_usuario',$idUsuario)
+            // Al actualizar, cambiamos la clave Y generamos un nuevo token aleatorio.
+            // Esto "rompe" la coincidencia con cualquier sesión activa del usuario.
+            Usuario::where('id_usuario', $idUsuario)
                 ->update([
-                    'clave' => Hash::make($claveNueva),
-            ]);
+                    'clave'         => Hash::make($claveNueva),
+                    'session_token' => Str::random(40), // <--- Aquí cambiamos el token de sesión
+                ]);
+                
             return response()->json(true);
 
         } catch (Exception $e) {
-            return response()->json(['error_bd' => $e->getMessage()]);
+            return response()->json(['error_bd' => $e->getMessage()], 500);
         }
     }
 
@@ -241,5 +262,43 @@ class UsuariosController extends Controller
             ->first();
 
         return response()->json($user);
+    }
+
+    // public function actualizarTokenSesion(Request $request, $idUsuario)
+    // {
+    //     try {
+    //         Usuario::where('id_usuario', $idUsuario)->update(['session_token' => $request->session_token]);
+            
+    //         return response()->json(true);
+
+    //     } catch (Exception $e) {
+    //         return response()->json(['error_bd' => $e->getMessage()]);
+    //     }
+    // }
+
+    public function actualizarTokenSesion(Request $request, $idUsuario)
+    {
+        // 1. Validación básica
+        if (!$request->has('session_token')) {
+            return response()->json(['error' => 'Token no proporcionado'], 400);
+        }
+
+        try {
+            // 2. Intentar la actualización
+            $actualizado = Usuario::where('id_usuario', $idUsuario)
+                ->update([
+                    'session_token' => $request->session_token,
+                    // Si tienes un campo de auditoría en la tabla usuarios, podrías usar $request->id_audit
+                ]);
+
+            if ($actualizado) {
+                return response()->json(true);
+            }
+
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+
+        } catch (Exception $e) {
+            return response()->json(['error_bd' => $e->getMessage()], 500);
+        }
     }
 }

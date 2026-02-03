@@ -44,6 +44,7 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     $router->post('validar_identificacion', 'usuarios\UsuariosController@validarIdentificacion');
     $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
     $router->get('consulta_usuario_logueado/{idUsuario}', 'usuarios\UsuariosController@consultaUsuarioLogueado');
+    $router->post('actualizar_token_sesion/{idUsuario}', 'usuarios\UsuariosController@actualizarTokenSesion');
 
     // ========================================================================
 

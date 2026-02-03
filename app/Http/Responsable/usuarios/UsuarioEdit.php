@@ -68,7 +68,8 @@ class UsuarioEdit implements Responsable
                     'fecha_contrato',
                     'fecha_terminacion_contrato',
                     'empresas.id_empresa',
-                    'nombre_empresa'
+                    'nombre_empresa',
+                    'session_token'
                 )
                 ->where('id_usuario', $idUsuario)
                 ->first();
