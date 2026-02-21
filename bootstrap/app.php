@@ -85,9 +85,9 @@ class_alias(\OwenIt\Auditing\Facades\Auditor::class, 'Auditor');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    App\Http\Middleware\ApiTrafficLogger::class,
+]);
 
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
