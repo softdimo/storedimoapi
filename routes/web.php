@@ -217,4 +217,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
     $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
     // $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
+
+    // ========================================================================
+
+    // MÉTRICAS
+    $router->get('metricas_index', 'metricas\MetricasController@index');
 }); // api
