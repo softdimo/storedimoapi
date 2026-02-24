@@ -19,6 +19,7 @@ use App\Models\Usuario;
 use App\Models\TipoBd;
 use App\Models\Plan;
 use App\Models\Suscripcion;
+use App\Models\TipoMetrica;
 
 class TraitAppWeb implements Responsable
 {
@@ -73,6 +74,8 @@ class TraitAppWeb implements Responsable
 
                 // Para obtener TODOS los campos del plan en un arreglo indexado por id_plan
                 'planesData' => Plan::orderBy('nombre_plan')->get()->keyBy('id_plan'),
+
+                'tiposMetrica' => TipoMetrica::orderBy('id_tipo_metrica')->get(['tipo_metrica', 'id_tipo_metrica']),
 
             ]);
         } catch (Exception $e) {

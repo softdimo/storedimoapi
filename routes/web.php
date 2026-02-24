@@ -92,6 +92,20 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
 
     // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
     $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
+
+    // ========================================================================
+
+    // MÉTRICAS
+    $router->get('metricas_index', 'metricas\MetricasController@index');
+    $router->post('query_total_absoluto', 'metricas\MetricasController@queryTotalAbsoluto');
+    $router->post('query_subtotal_actividad', 'metricas\MetricasController@querySubtotalActividad');
+    $router->post('query_movimiento_bd', 'metricas\MetricasController@queryMovimientoBd');
+    $router->post('query_por_fuente', 'metricas\MetricasController@queryPorFuente');
+    $router->post('query_ranking_tenants', 'metricas\MetricasController@queryRankingTenants');
+    $router->post('query_monitoreo_errores', 'metricas\MetricasController@queryMonitoreoErrores');
+    $router->post('query_rutas_utilizadas', 'metricas\MetricasController@queryRutasUtilizadas');
+    $router->post('query_actividad_horas', 'metricas\MetricasController@queryActividadHoras');
+    $router->post('borrar_registros', 'metricas\MetricasController@borrarRegistros');
 }); // FIN api/administracion
 
 // ========================================================================
@@ -218,8 +232,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
     // $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
 
-    // ========================================================================
-
-    // MÉTRICAS
-    $router->get('metricas_index', 'metricas\MetricasController@index');
+    
 }); // api
