@@ -96,6 +96,7 @@ $router->group(['prefix' => 'api/administracion'], function () use ($router) {
     // ========================================================================
 
     // MÉTRICAS
+    $router->post('metricas_store', 'metricas\MetricasController@store');
     $router->get('metricas_index', 'metricas\MetricasController@index');
     $router->post('query_total_absoluto', 'metricas\MetricasController@queryTotalAbsoluto');
     $router->post('query_subtotal_actividad', 'metricas\MetricasController@querySubtotalActividad');

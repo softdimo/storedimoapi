@@ -5,6 +5,7 @@ namespace App\Http\Controllers\metricas;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Responsable\metricas\MetricaIndex;
+use App\Http\Responsable\metricas\MetricaStore;
 use App\Models\Metrica;
 use App\Helpers\DatabaseConnectionHelper;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,7 @@ class MetricasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return new MetricaStore();
     }
 
     // ======================================================================
