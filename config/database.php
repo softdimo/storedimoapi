@@ -17,6 +17,7 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+            'timezone' => '-05:00', // <--- Esto fuerza a MySQL a trabajar en hora Colombia
         ],
 
         'tenant' => [
@@ -32,6 +33,7 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+            'timezone' => '-05:00', // <--- Esto fuerza a MySQL a trabajar en hora Colombia
         ],
     ],
 ];

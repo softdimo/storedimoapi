@@ -26,6 +26,7 @@ class MetricaIndex implements Responsable
                 'updated_at'
             )
             ->orderByDesc('created_at')
+            ->take(1000)
             ->get();
 
             return response()->json($metricas);
