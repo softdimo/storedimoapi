@@ -233,3 +233,4 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
     // $router->get('empresas_disponibles_suscripcion/{id}', 'traits\TraitsController@getEmpresasSuscripcion');
 }); // api
+
