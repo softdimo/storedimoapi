@@ -30,4 +30,12 @@ class Metrica extends Model implements Auditable
         'status_code',
         'user_agent',
     ];
+
+    /**
+     * Prepare a date for array / JSON serialization.
+    */
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 }
