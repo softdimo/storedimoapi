@@ -32,7 +32,7 @@ class MetricaIndex implements Responsable
             return response()->json($metricas);
             
         } catch (Exception $e) {
-            return response()->json(['error_bd' => $e->getMessage()]);
+            return response()->json(['error_bd' => $e->getMessage()], 500);
         }
     }
 }
