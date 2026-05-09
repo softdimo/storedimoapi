@@ -32,7 +32,11 @@ class Venta extends Model implements Auditable
         'id_cliente',
         'id_usuario',
         'id_estado_credito',
-        'fecha_limite_credito'
+        'fecha_limite_credito',
+        'motivo_anulacion',
+        'fecha_anulacion_venta',
+        'usuario_anulacion',
+        'id_estado_venta'
     ];
 
     public function __construct(array $attributes = [])
