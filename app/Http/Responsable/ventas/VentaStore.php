@@ -48,7 +48,7 @@ class VentaStore implements Responsable
                 'id_tipo_pago' => $idTipoPago,
                 'id_cliente' => $idCliente,
                 'id_usuario' => $usuLogueado,
-                'id_estado' => $idEstado,
+                'id_estado_venta' => $idEstado,
                 'id_estado_credito' => $idEstadoCredito,
                 'fecha_limite_credito' => $fechaLimiteCredito
             ]);
@@ -91,9 +91,11 @@ class VentaStore implements Responsable
                 return response()->json(['success' => true]);
             }
 
-        } catch (Exception $e) {
+        } catch (Exception $e)
+        {
             // Asegurar restauración de conexión principal en caso de error
-            if (isset($empresaActual)) {
+            if (isset($empresaActual))
+            {
                 DatabaseConnectionHelper::restaurarConexionPrincipal();
             }
             
