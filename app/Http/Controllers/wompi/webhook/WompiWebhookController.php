@@ -36,7 +36,8 @@ class WompiWebhookController extends Controller
         $statusWompi   = $transaction['status'];
         $montoCentavos = $transaction['amount_in_cents'];
         $timestamp     = $payload['timestamp'];
-        $secretoEventos = env('WOMPI_EVENTS_SECRET'); // El que guardamos en tu .env
+        // $secretoEventos = env('WOMPI_EVENTS_SECRET');
+        $secretoEventos = config('services.wompi.events_secret');
 
         $cadenaLocal = $idTransaccion . $statusWompi . $montoCentavos . $timestamp . $secretoEventos;
         $firmaLocal  = hash('sha256', $cadenaLocal);
@@ -68,12 +69,12 @@ class WompiWebhookController extends Controller
 
             if ($statusWompi === 'APPROVED') {
                 // PAGO EXITOSO: Cambiamos a Estado 13 (Para tu activación manual)
-                $suscripcion->id_estado_suscripcion = 13; 
+                $suscripcion->id_estado_suscripcion = 13;
                 $suscripcion->observaciones_suscripcion = "Pago aprobado en Wompi. ID: " . $idTransaccion;
                 $suscripcion->save();
 
                 if ($empresa) {
-                    $empresa->id_estado = 13; 
+                    $empresa->id_estado = 13;
                     $empresa->save();
                 }
             } else {
@@ -83,7 +84,7 @@ class WompiWebhookController extends Controller
                 $suscripcion->save();
 
                 if ($empresa) {
-                    $empresa->id_estado = 14; 
+                    $empresa->id_estado = 14;
                     $empresa->save();
                 }
             }
