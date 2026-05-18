@@ -36,7 +36,6 @@ class WompiWebhookController extends Controller
         $statusWompi   = $transaction['status'];
         $montoCentavos = $transaction['amount_in_cents'];
         $timestamp     = $payload['timestamp'];
-        // $secretoEventos = env('WOMPI_EVENTS_SECRET');
         $secretoEventos = config('services.wompi.events_secret');
 
         $cadenaLocal = $idTransaccion . $statusWompi . $montoCentavos . $timestamp . $secretoEventos;
