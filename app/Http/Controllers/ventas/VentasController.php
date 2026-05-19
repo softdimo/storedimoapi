@@ -13,6 +13,7 @@ use App\Http\Responsable\ventas\VentaUpdate;
 use App\Models\Empresa;
 use App\Models\Venta;
 use App\Models\VentaProducto;
+use App\Models\Producto;
 use App\Models\Persona;
 use App\Helpers\DatabaseConnectionHelper;
 use Exception;
@@ -152,25 +153,48 @@ class VentasController extends Controller
     {
         // 1. Obtener ID de empresa del request (antes era empresa_actual completo)
         $empresaId = $request->input('empresa_actual');
+        $motivo = $request->input('motivo');
+        $fecha = $request->input('fechaAnulacion');
+        $usuario = $request->input('usuarioAnulacion');
 
         // 2. Buscar empresa completa usando el ID
         $empresaActual = Empresa::find($empresaId);
         
         // Configurar conexión tenant si hay empresa
-        if ($empresaActual) {
+        if ($empresaActual)
+        {
             DatabaseConnectionHelper::configurarConexionTenant($empresaActual->toArray());
         }
 
         $venta = Venta::find($idVenta);
 
-        if (isset($venta) && !is_null($venta) && !empty($venta)) {
-
-            try {
-                $venta->id_venta = 2;
+        if (isset($venta) && !is_null($venta) && !empty($venta))
+        {
+            try
+            {
+                $venta->id_estado_venta = 2;
+                $venta->motivo_anulacion = $motivo;
+                $venta->fecha_anulacion_venta = $fecha;
+                $venta->usuario_anulacion = $usuario;
                 $venta->update();
 
+                $productosVenta = VentaProducto::where('id_venta', $idVenta)->get();
+
+                foreach ($productosVenta as $item)
+                {
+                    $producto = Producto::find($item->id_producto);
+                
+                    if ($producto)
+                    {
+                        $nuevaCantidad = $producto->cantidad + $item->cantidad;
+                        $producto->cantidad = max($nuevaCantidad, 0); // evita cantidades negativas
+                        $producto->save();
+                    }
+                }
+
                 // Restaurar conexión principal si se usó tenant
-                if ($empresaActual) {
+                if ($empresaActual)
+                {
                     DatabaseConnectionHelper::restaurarConexionPrincipal();
                 }
 
@@ -186,9 +210,6 @@ class VentasController extends Controller
             }
         }
     }
-
-    // ======================================================================
-    // ======================================================================
 
     public function reporteVentasPdf(Request $request)
     {

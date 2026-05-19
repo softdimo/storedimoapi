@@ -235,3 +235,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // TRAITS - RUTA CONSOLIDADA (Para evitar timeouts de 60s)
     // $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
 }); // api
+
+// ========================================================================
+// ENDPOINTS PÚBLICOS / CONEXIONES EXTERNAS
+// ========================================================================
+// URL Real: https://storedimoapi.softdimo.com/api/wompi/webhook
+$router->post('api/wompi/webhook', 'wompi\webhook\WompiWebhookController@procesarNotificacion');
