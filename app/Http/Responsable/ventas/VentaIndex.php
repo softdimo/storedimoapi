@@ -44,13 +44,15 @@ class VentaIndex implements Responsable
                 ->leftjoinSub($gananciaTotalSubquery, 'ganancias', function ($join) {
                     $join->on('ganancias.id_venta', '=', 'ventas.id_venta');
                 })
+                ->join('estados', 'estados.id_estado', '=', 'ventas.id_estado_venta')
                 // Se removieron joins a productos y venta_productos que causaban duplicación
                 ->select(
                     'ventas.id_venta',
-                    'fecha_venta',
-                    'descuento',
-                    'subtotal_venta',
-                    'total_venta',
+                    'ventas.id_estado_venta',
+                    'ventas.fecha_venta',
+                    'ventas.descuento',
+                    'ventas.subtotal_venta',
+                    'ventas.total_venta',
                     DB::raw("CONCAT('$', FORMAT(total_venta, 0, 'de_DE')) as total_venta_index"),
                     'tipos_pago.id_tipo_pago',
                     'tipo_pago',
@@ -68,36 +70,6 @@ class VentaIndex implements Responsable
                 )
                 ->orderByDesc('fecha_venta')
                 ->get();
-
-
-            // $ventas = Venta::leftjoin('tipos_pago','tipos_pago.id_tipo_pago','=','ventas.id_tipo_pago')
-            //     ->leftjoin('productos','productos.id_producto','=','ventas.id_producto')
-            //     ->leftjoin('personas','personas.id_persona','=','ventas.id_cliente')
-            //     ->leftjoin('empresas','empresas.id_empresa','=','ventas.id_empresa')
-            //     ->leftjoin('venta_productos','venta_productos.id_venta_producto','=','ventas.id_venta')
-            //     ->select(
-            //         'id_venta',
-            //         'fecha_venta',
-            //         'descuento',
-            //         'subtotal_venta',
-            //         'total_venta',
-            //         DB::raw("CONCAT('$', FORMAT(total_venta, 0, 'de_DE')) as total_venta_index"),
-            //         'tipos_pago.id_tipo_pago',
-            //         'tipo_pago',
-            //         'productos.id_producto',
-            //         'nombre_producto',
-            //         'precio_unitario',
-            //         'cantidad',
-            //         'personas.id_persona as id_cliente',
-            //         'personas.identificacion',
-            //         DB::raw("CONCAT(nombres_persona, ' ', apellidos_persona) AS nombres_cliente"),
-            //         'ventas.id_usuario',
-            //         'ventas.id_estado_credito',
-            //         'id_tipo_cliente',
-            //         'empresas.id_empresa'
-            //     )
-            //     ->orderByDesc('fecha_venta')
-            //     ->get();
 
                 // Restaurar conexión principal si se usó tenant
                 if ($empresaActual) {
@@ -134,20 +106,10 @@ class VentaIndex implements Responsable
                     $venta->ganancia_total_venta = $venta->ganancia_total_venta ?? 0;
                 }
 
-                // 3. Agregar nombre completo del usuario desde la base principal
-                // foreach ($ventas as $venta) {
-                //     $usuario = DB::connection('mysql') // o la conexión principal que uses
-                //         ->table('usuarios')
-                //         ->where('id_usuario', $venta->id_usuario)
-                //         ->select(DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario) as nombres_usuario"))
-                //         ->first();
-
-                //     $venta->nombres_usuario = $usuario->nombres_usuario ?? 'Sin usuario';
-                // }
-
                 return response()->json($ventas);
 
-        } catch (Exception $e) {
+        } catch (Exception $e)
+        {
             // Asegurar restauración de conexión principal en caso de error
             if (isset($empresaActual)) {
                 DatabaseConnectionHelper::restaurarConexionPrincipal();

@@ -10,24 +10,6 @@ class EmpresaStore implements Responsable
 {
     public function toResponse($request)
     {
-        // $idTipoDocumento = request('id_tipo_documento', null);
-        // $nitEmpresa = request('nit_empresa', null);
-        // $identEmpresaNatural = request('ident_empresa_natural', null);
-        // $nombreEmpresa = request('nombre_empresa', null);
-        // $telefonoEmpresa = request('telefono_empresa', null);
-        // $celularEmpresa = request('celular_empresa');
-        // $emailEmpresa = request('email_empresa');
-        // $direccionEmpresa = request('direccion_empresa');
-        // $idEstado = request('id_estado');
-        // $appKey = request('app_key');
-        // $appUrl = request('app_url');
-        // $idTipoBd = request('id_tipo_bd');
-        // $dbHost = request('db_host');
-        // $dbDatabase = request('db_database');
-        // $dbUsername = request('db_username');
-        // $dbPassword = request('db_password');
-        // $logoEmpresa = request('logo_empresa');
-
         try {
             $nuevaEmpresa = Empresa::create([
                 'id_tipo_documento'     => $request->input('id_tipo_documento'),
@@ -47,28 +29,13 @@ class EmpresaStore implements Responsable
                 'db_username'           => $request->input('db_username'),
                 'db_password'           => $request->input('db_password'),
                 'logo_empresa'          => $request->input('logo_empresa')
-
-                // 'id_tipo_documento' => $idTipoDocumento,
-                // 'nit_empresa' => $nitEmpresa,
-                // 'ident_empresa_natural' => $identEmpresaNatural,
-                // 'nombre_empresa' => $nombreEmpresa,
-                // 'telefono_empresa' => $telefonoEmpresa,
-                // 'celular_empresa' => $celularEmpresa,
-                // 'email_empresa' => $emailEmpresa,
-                // 'direccion_empresa' => $direccionEmpresa,
-                // 'id_estado' => $idEstado,
-                // 'app_key' => $appKey,
-                // 'app_url' => $appUrl,
-                // 'id_tipo_bd' => $idTipoBd,
-                // 'db_host' => $dbHost,
-                // 'db_database' => $dbDatabase,
-                // 'db_username' => $dbUsername,
-                // 'db_password' => $dbPassword,
-                // 'logo_empresa' => $logoEmpresa
             ]);
 
-            if (isset($nuevaEmpresa) && !is_null($nuevaEmpresa) && !empty($nuevaEmpresa)) {
-                return response()->json(['success' => true]);
+            if ($nuevaEmpresa) {
+                return response()->json([
+                    'success' => true,
+                    'empresa' => $nuevaEmpresa
+                ]);
             }
 
         } catch (Exception $e) {
