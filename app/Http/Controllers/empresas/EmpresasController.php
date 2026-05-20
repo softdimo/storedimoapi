@@ -169,6 +169,34 @@ class EmpresasController extends Controller
 
     // ======================================================================
     // ======================================================================
+    public function validarDocumento(Request $request)
+    {
+        $identEmpresaNatural = $request->input('ident_empresa_natural', null);
+        try {
+            $numerodocumentoExist = Empresa::where('ident_empresa_natural', $identEmpresaNatural)->first();
+
+            if ($numerodocumentoExist) {
+                return response()->json([
+                    'valido' => false,
+                    'mensaje' => 'El número de documento ya está registrado.',
+                    'empresa' => $numerodocumentoExist
+                ]);
+            }
+
+            return response()->json([
+                'valido' => true,
+                'mensaje' => 'El número de documento está disponible.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error_bd' => $e->getMessage(),
+                'valido' => false
+            ], 500);
+        }
+    }
+
+    // ======================================================================
+    // ======================================================================
 
     public function validarCorreoEmpresa(Request $request)
     {
