@@ -169,6 +169,7 @@ class EmpresasController extends Controller
 
     // ======================================================================
     // ======================================================================
+    
     public function validarDocumento(Request $request)
     {
         $identEmpresaNatural = $request->input('ident_empresa_natural', null);
