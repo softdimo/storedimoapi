@@ -126,4 +126,6 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+// $app->register(Illuminate\Http\Client\HttpClientServiceProvider::class);
+
 return $app;
