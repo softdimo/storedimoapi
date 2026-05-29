@@ -8,6 +8,7 @@ use App\Models\Suscripcion;
 use App\Models\Empresa;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class WompiWebhookController extends Controller
 {
@@ -66,10 +67,13 @@ class WompiWebhookController extends Controller
 
             $empresa = Empresa::find($suscripcion->id_empresa_suscrita);
 
+            // Variable para controlar si disparamos la alerta de correo a la App Web
+            $notificarCambioApp = false;
+
             if ($statusWompi === 'APPROVED') {
                 // PAGO EXITOSO: Cambiamos a Estado 13 (Para tu activación manual)
                 $suscripcion->id_estado_suscripcion = 13;
-                $suscripcion->observaciones_suscripcion = "Pago aprobado en Wompi. ID: " . $idTransaccion;
+                $suscripcion->observaciones_suscripcion = "Pago aprobado en Wompi(Asíncrono). ID: " . $idTransaccion;
                 $suscripcion->save();
 
                 if ($empresa) {
@@ -77,17 +81,21 @@ class WompiWebhookController extends Controller
                     $empresa->save();
                 }
 
+                $notificarCambioApp = true;
+
             } elseif (in_array($statusWompi, ['DECLINED', 'VOIDED', 'ERROR'])) {
         
                 // PAGO FALLIDO DEFINITIVO: Estado 14
                 $suscripcion->id_estado_suscripcion = 14;
-                $suscripcion->observaciones_suscripcion = "Pago fallido en Wompi ($statusWompi). ID: " . $idTransaccion;
+                $suscripcion->observaciones_suscripcion = "Pago fallido en Wompi ($statusWompi) (Asíncrono). ID: " . $idTransaccion;
                 $suscripcion->save();
         
                 if ($empresa) {
                     $empresa->id_estado = 14;
                     $empresa->save();
                 }
+
+                $notificarCambioApp = true;
         
             } elseif ($statusWompi === 'PENDING') {
                 
@@ -101,6 +109,31 @@ class WompiWebhookController extends Controller
                     $empresa->save();
                 }
             }
+
+            // ======================================================================
+            // NOTIFICAR A LA APP WEB PARA DISPARAR CORREOS
+            // ======================================================================
+            if ($notificarCambioApp) {
+                try {
+                    // Url de tu Landing/App Web (ej: https://storedimoapp.com/api/wompi-notificar-correo)
+                    $urlAppWeb = config('services.app_web.url') . '/api/wompi-notificar-correo';
+                    
+                    Http::withHeaders([
+                        'X-Storedimo-Token' => config('services.app_web.internal_token') // Seguridad simple entre tu API y tu App
+                    ])->post($urlAppWeb, [
+                        'id_suscripcion' => $idSuscripcion,
+                        'id_transaccion' => $idTransaccion,
+                        'estado_wompi'   => $statusWompi
+                    ]);
+
+                    Log::info("Notificación de correo enviada a la App Web para la suscripción: " . $idSuscripcion);
+
+                } catch (Exception $eMail) {
+                    // Capturamos el error por si la App Web está caída, para que no rompa el webhook de Wompi (200)
+                    Log::error('No se pudo comunicar con la App Web para enviar el correo: ' . $eMail->getMessage());
+                }
+            }
+            // ======================================================================
 
             // Obligatorio responderle 200 a Wompi para que no siga intentando enviar el mismo cobro
             return response()->json(['success' => true, 'message' => 'Procesado correctamente'], 200);
