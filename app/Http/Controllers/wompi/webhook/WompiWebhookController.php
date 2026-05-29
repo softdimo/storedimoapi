@@ -76,20 +76,34 @@ class WompiWebhookController extends Controller
                     $empresa->id_estado = 13;
                     $empresa->save();
                 }
-            } else {
-                // PAGO FALLIDO / RECHAZADO: Cambiamos al nuevo Estado 14 (Falla de pago)
+
+            } elseif (in_array($statusWompi, ['DECLINED', 'VOIDED', 'ERROR'])) {
+        
+                // PAGO FALLIDO DEFINITIVO: Estado 14
                 $suscripcion->id_estado_suscripcion = 14;
                 $suscripcion->observaciones_suscripcion = "Pago fallido en Wompi ($statusWompi). ID: " . $idTransaccion;
                 $suscripcion->save();
-
+        
                 if ($empresa) {
                     $empresa->id_estado = 14;
+                    $empresa->save();
+                }
+        
+            } elseif ($statusWompi === 'PENDING') {
+                
+                // PAGO EN PROCESO (PSE / Tarjetas en validación): Estado 15
+                $suscripcion->id_estado_suscripcion = 15;
+                $suscripcion->observaciones_suscripcion = "Pago en verificación asíncrona (PSE/Crédito). ID: " . $idTransaccion;
+                $suscripcion->save();
+                
+                if ($empresa) {
+                    $empresa->id_estado = 15;
                     $empresa->save();
                 }
             }
 
             // Obligatorio responderle 200 a Wompi para que no siga intentando enviar el mismo cobro
-            return response()->json(['success' => true, 'message' => 'Procesado'], 200);
+            return response()->json(['success' => true, 'message' => 'Procesado correctamente'], 200);
 
         } catch (Exception $e) {
             Log::error('Error en Webhook Wompi: ' . $e->getMessage());
