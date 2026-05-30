@@ -25,8 +25,15 @@ class SuscripcionStore implements Responsable
                 'observaciones_suscripcion' => $request->input('observaciones_suscripcion'),
             ]);
 
+            // if ($nuevaSuscripcion) {
+            //     return response()->json(['success' => true]);
+            // }
+
             if ($nuevaSuscripcion) {
-                return response()->json(['success' => true]);
+                return response()->json([
+                    'success' => true,
+                    'suscripcion' => $nuevaSuscripcion
+                ]);
             }
 
         } catch (Exception $e) {

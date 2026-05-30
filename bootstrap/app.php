@@ -73,6 +73,8 @@ $app->configure('permission');
 $app->register(\OwenIt\Auditing\AuditingServiceProvider::class);
 class_alias(\OwenIt\Auditing\Facades\Auditor::class, 'Auditor');
 
+$app->configure('services');
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -123,5 +125,7 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
+// $app->register(Illuminate\Http\Client\HttpClientServiceProvider::class);
 
 return $app;
