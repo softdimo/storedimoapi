@@ -275,7 +275,7 @@ class EntradasController extends Controller
                     DB::raw("DATE_FORMAT(FROM_UNIXTIME(compras.fecha_anulacion_compra), '%d-%m-%Y') AS fecha_anulacion"),
                     DB::raw("CONCAT(usuarios.nombre_usuario, ' ', usuarios.apellido_usuario, ' - ', usuario) AS usuario_anulacion"),
                     DB::raw("CONCAT('$', FORMAT(precio_unitario_compra, 0, 'de_DE')) as precio_unitario_compra"),
-                    DB::raw("CONCAT('$', FORMAT(subtotal, 0, 'de_DE')) as subtotal"),
+                    DB::raw("CONCAT('$', FORMAT(subtotal, 0, 'de_DE')) as subtotal")
                 )
                 ->orderBy('nombre_producto')
                 ->get();
