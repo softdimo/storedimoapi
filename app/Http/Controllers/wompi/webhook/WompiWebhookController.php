@@ -108,6 +108,8 @@ class WompiWebhookController extends Controller
                     $empresa->id_estado = 15;
                     $empresa->save();
                 }
+
+                $notificarCambioApp = true;
             }
 
             // ======================================================================
