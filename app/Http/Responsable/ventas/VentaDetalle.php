@@ -60,7 +60,8 @@ class VentaDetalle implements Responsable
                     // 'estado',
                     'id_tipo_cliente',
                     // 'tipo_persona',
-                    'empresas.id_empresa'
+                    'empresas.id_empresa',
+                    'id_estado_venta'
                 )
                 ->where('id_venta', $this->idVenta)
                 ->orderByDesc('fecha_venta')
