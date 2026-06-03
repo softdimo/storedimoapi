@@ -273,9 +273,6 @@ class VentasController extends Controller
             return response()->json(['error_bd' => $e->getMessage()]);
         }
     }
-
-    // ======================================================================
-    // ======================================================================
     
     public function detalleVenta(Request $request, $idVenta)
     {
@@ -293,6 +290,7 @@ class VentasController extends Controller
         try {
             $detalleVenta = VentaProducto::leftJoin('ventas', 'ventas.id_venta', '=', 'venta_productos.id_venta')
                 ->leftJoin('productos', 'productos.id_producto', '=', 'venta_productos.id_producto')
+                ->leftJoin('usuarios', 'usuarios.id_usuario', '=', 'ventas.usuario_anulacion')
                 ->where('venta_productos.id_venta', $idVenta)
                 ->select(
                     'venta_productos.id_venta',
@@ -315,7 +313,11 @@ class VentasController extends Controller
                             END
                         , 0, 'de_DE')) as precio_venta_detalle
                     "),
-                    DB::raw("CONCAT('$', FORMAT(ganancia_venta, 0, 'de_DE')) as ganancia_venta")
+                    DB::raw("CONCAT('$', FORMAT(ganancia_venta, 0, 'de_DE')) as ganancia_venta"),
+                    'ventas.motivo_anulacion',
+                    DB::raw("DATE_FORMAT(FROM_UNIXTIME(ventas.fecha_anulacion_venta), '%d-%m-%Y') AS fecha_anulacion"),
+                    DB::raw("CONCAT(usuarios.nombre_usuario, ' ', usuarios.apellido_usuario, ' - ', usuario) AS usuario_anulacion"),
+                    'ventas.id_estado_venta'
                 )
                 ->orderBy('nombre_producto')
                 ->get();
@@ -336,9 +338,6 @@ class VentasController extends Controller
             return response()->json(['error_bd' => $e->getMessage()]);
         }
     }
-
-    // ===================================================================
-    // ===================================================================
 
     public function ventaDiaMes(Request $request)
     {

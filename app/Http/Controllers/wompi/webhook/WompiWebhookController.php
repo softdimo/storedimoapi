@@ -8,7 +8,7 @@ use App\Models\Suscripcion;
 use App\Models\Empresa;
 use Exception;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Facades\Http;
 
 class WompiWebhookController extends Controller
 {
@@ -108,6 +108,8 @@ class WompiWebhookController extends Controller
                     $empresa->id_estado = 15;
                     $empresa->save();
                 }
+
+                $notificarCambioApp = true;
             }
 
             // ======================================================================
@@ -117,15 +119,20 @@ class WompiWebhookController extends Controller
                 try {
                     // Url de tu Landing/App Web (ej: https://storedimoapp.com/api/wompi-notificar-correo)
                     $urlAppWeb = config('services.app_web.url') . '/api/wompi-notificar-correo';
-                    
-                    Http::withHeaders([
-                        'X-Storedimo-Token' => config('services.app_web.internal_token') // Seguridad simple entre tu API y tu App
-                    ])->post($urlAppWeb, [
-                        'id_suscripcion' => $idSuscripcion,
-                        'id_transaccion' => $idTransaccion,
-                        'estado_wompi'   => $statusWompi
-                    ]);
 
+                    $client = new \GuzzleHttp\Client();
+                    $client->post($urlAppWeb, [
+                        'headers' => [
+                            'X-Storedimo-Token' => config('services.app_web.internal_token'),
+                            'Content-Type'      => 'application/json',
+                        ],
+                        'json' => [
+                            'id_suscripcion' => $idSuscripcion,
+                            'id_transaccion' => $idTransaccion,
+                            'estado_wompi'   => $statusWompi
+                        ]
+                    ]);
+                    
                     Log::info("Notificación de correo enviada a la App Web para la suscripción: " . $idSuscripcion);
 
                 } catch (Exception $eMail) {
