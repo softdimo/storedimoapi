@@ -133,14 +133,6 @@ class WompiWebhookController extends Controller
                         ]
                     ]);
                     
-                    // Http::withHeaders([
-                    //     'X-Storedimo-Token' => config('services.app_web.internal_token') // Seguridad simple entre tu API y tu App
-                    // ])->post($urlAppWeb, [
-                    //     'id_suscripcion' => $idSuscripcion,
-                    //     'id_transaccion' => $idTransaccion,
-                    //     'estado_wompi'   => $statusWompi
-                    // ]);
-
                     Log::info("Notificación de correo enviada a la App Web para la suscripción: " . $idSuscripcion);
 
                 } catch (Exception $eMail) {
