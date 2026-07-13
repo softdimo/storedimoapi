@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use App\Models\ModelHasPermissions;
-
+use App\Models\Empresa;
 class UsuarioStore implements Responsable
 {
     public function toResponse($request)
@@ -31,6 +31,15 @@ class UsuarioStore implements Responsable
         $clave = request('clave', null);
         $claveFallas = request('clave_fallas', null);
         $idEmpresa = request('id_empresa', null);
+        $correoEmpresa = null;
+
+        // Consultamos si existe usuario administrador para la nueva empresa
+        if($idRol == 1)
+        {
+            $consultaUsuario = Usuario::where('id_rol', $idRol)
+                                ->where('id_empresa', $idEmpresa) 
+                                ->first(); 
+        }
 
         $nuevoUsuario = Usuario::create([
             'nombre_usuario' => ucwords($nombreUsuario),
@@ -55,12 +64,22 @@ class UsuarioStore implements Responsable
 
         if (isset($nuevoUsuario) && !is_null($nuevoUsuario) && !empty($nuevoUsuario))
         {
+            // Enviamos correo si NO se encuentra ningún usuario administrador para la nueva empresa
+            if(!isset($consultaUsuario) && (is_null($consultaUsuario) || empty($consultaUsuario)))
+            {
+                $datosEmpresa = Empresa::select('email_empresa')
+                                ->where('id_empresa', $idEmpresa)
+                                ->where('id_estado', 1)
+                                ->first();
+            }
+
             $this->asignarPermisosPorRol($idRol, $nuevoUsuario);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Usuario creado correctamente',
-                'usuario' => $nuevoUsuario
+                'usuario' => $nuevoUsuario,
+                'correo_empresa' => $datosEmpresa->email_empresa
             ]);
         } else {
             return abort(404, 'No existe este usuario');
