@@ -5,6 +5,7 @@ namespace App\Http\Responsable\planes;
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
 use App\Models\Plan;
+use App\Models\Usuario;
 
 class PlanIndex implements Responsable
 {
@@ -29,7 +30,8 @@ class PlanIndex implements Responsable
 
             return response()->json($planes);
             
-        } catch (Exception $e) {
+        } catch (Exception $e)
+        {
             return response()->json(['error_bd' => $e->getMessage()]);
         }
     }

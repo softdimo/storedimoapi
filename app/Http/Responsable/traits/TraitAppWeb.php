@@ -59,6 +59,7 @@ class TraitAppWeb implements Responsable
                 'porcentajes_comision' => PorcentajeComision::orderBy('porcentaje_comision')->get(['porcentaje_comision', 'id_porcentaje_comision']),
                 'empresas' => Empresa::orderBy('nombre_empresa')->where('id_estado', 1)->get(['nombre_empresa', 'id_empresa']),
                 'tipos_bd' => TipoBd::orderBy('tipo_bd')->get(['tipo_bd', 'id_tipo_bd']),
+                
                 'usuarios' => Usuario::orderBy('id_usuario')
                                             ->select(
                                                 DB::raw("CONCAT(nombre_usuario, ' ', apellido_usuario, ' => ', usuario) AS user"),
@@ -98,7 +99,8 @@ class TraitAppWeb implements Responsable
             $idsAExcluir = array_merge($empresasConSuscripcion, $idsFijosAExcluir);
 
             // 4. Quitar de la exclusión si es edición
-            if ($idEmpresaActual && $idEmpresaActual != 'null') {
+            if ($idEmpresaActual && $idEmpresaActual != 'null')
+            {
                 $idsAExcluir = array_diff($idsAExcluir, [$idEmpresaActual]);
             }
 
@@ -109,7 +111,8 @@ class TraitAppWeb implements Responsable
                 ->get(['nombre_empresa', 'id_empresa']);
 
             // 5. REINCORPORADO: Si estamos en EDICIÓN, forzamos la inclusión de la empresa actual
-            if ($idEmpresaActual && $idEmpresaActual != 'null') {
+            if ($idEmpresaActual && !is_null($idEmpresaActual))
+            {
                 $empresaActual = Empresa::where('id_empresa', $idEmpresaActual)
                     ->get(['nombre_empresa', 'id_empresa']);
                 

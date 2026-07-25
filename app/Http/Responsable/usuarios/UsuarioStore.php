@@ -125,7 +125,7 @@ class UsuarioStore implements Responsable
 
     private function permisosSoftdimo()
     {
-        return range(1, 65);
+        return range(1, 86);
     }
 
     private function permisosSuperAdmin()

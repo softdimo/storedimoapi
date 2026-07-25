@@ -13,7 +13,8 @@ class EmpresaIndex implements Responsable
         $idRol = $request->input('id_rol');
         $idUsuario = $request->input('id_usuario');
 
-        try {
+        try
+        {
             // Obtener empresa del usuario
             $idEmpresa = Usuario::where('id_usuario', $idUsuario)
                 ->value('id_empresa');
