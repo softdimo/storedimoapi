@@ -10,7 +10,8 @@ class SuscripcionStore implements Responsable
 {
     public function toResponse($request)
     {
-        try {
+        try
+        {
             $nuevaSuscripcion = Suscripcion::create([
                 'id_empresa_suscrita'       => $request->input('id_empresa_suscrita'),
                 'id_plan_suscrito'          => $request->input('id_plan_suscrito'),
@@ -29,7 +30,8 @@ class SuscripcionStore implements Responsable
             //     return response()->json(['success' => true]);
             // }
 
-            if ($nuevaSuscripcion) {
+            if ($nuevaSuscripcion)
+            {
                 return response()->json([
                     'success' => true,
                     'suscripcion' => $nuevaSuscripcion
