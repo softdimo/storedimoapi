@@ -5,6 +5,7 @@ namespace App\Http\Responsable\suscripciones;
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
 use App\Models\Suscripcion;
+use Illuminate\Support\Facades\DB;
 
 class SuscripcionEdit implements Responsable
 {
@@ -36,7 +37,7 @@ class SuscripcionEdit implements Responsable
                     'dias_trial',
                     'id_tipo_pago_suscripcion',
                     'tipo_pago as modalidad_suscripcion',
-                    'valor_suscripcion',
+                    DB::raw('FORMAT(valor_suscripcion, 0) as valor_suscripcion'),
                     'fecha_inicial',
                     'fecha_final',
                     'id_estado_suscripcion',
