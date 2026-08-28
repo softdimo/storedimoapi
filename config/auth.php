@@ -14,7 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        // 'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -32,12 +33,13 @@ return [
     | mechanisms used by this application to persist your user's data.
     |
     | Supported: "session"
-    |
+    | Definimos el guard 'api' usando el driver 'jwt' provisto por tymon/jwt-auth
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
+        // 'web' => [
+        'api' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
@@ -62,7 +64,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Usuario::class,
         ],
 
         // 'users' => [

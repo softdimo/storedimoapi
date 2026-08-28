@@ -160,7 +160,7 @@ class UsuariosController extends Controller
     //     }
     // }
 
-    public function cambiarClave(Request $request, $idUsuario)
+    public function cambiarClaveUsuario(Request $request, $idUsuario)
     {
         $claveNueva = request('clave', null);
 
@@ -186,10 +186,11 @@ class UsuariosController extends Controller
         $identificacion = request('identificacion', null);
 
         try {
-             return Usuario::select('id_usuario','usuario','identificacion','email')
+            return Usuario::select('id_usuario','usuario','identificacion','email')
                 ->where('email', $email)
                 ->where('identificacion', $identificacion)
                 ->first();
+                
         } catch (Exception $e) {
             return response()->json('error_bd');
         }

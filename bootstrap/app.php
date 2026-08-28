@@ -62,7 +62,7 @@ if ($app->environment() !== 'production') {
     $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 }
 
-$app->withEloquent();
+$app->configure('app');
 
 $app->configure('app');
 
@@ -70,10 +70,10 @@ $app->configure('audit');
 
 $app->configure('permission');
 
+$app->configure('services');
+
 $app->register(\OwenIt\Auditing\AuditingServiceProvider::class);
 class_alias(\OwenIt\Auditing\Facades\Auditor::class, 'Auditor');
-
-$app->configure('services');
 
 /*
 |--------------------------------------------------------------------------
@@ -90,9 +90,9 @@ $app->middleware([
     App\Http\Middleware\ApiTrafficLogger::class,
 ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -106,8 +106,11 @@ $app->middleware([
 */
 
 // $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+// Registrar JWT Auth Service Provider
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -125,7 +128,5 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
-
-// $app->register(Illuminate\Http\Client\HttpClientServiceProvider::class);
 
 return $app;
