@@ -46,6 +46,23 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
         // $router->post('cambiar_clave/{idUsuario}', 'usuarios\UsuariosController@cambiarClave');
     });
+
+    // =====================================================================
+    // RUTAS LANDING PAGE (Protegidas M2M mediante LANDING_API_KEY)
+    // =====================================================================
+    $router->group(['prefix' => 'landing', 'middleware' => 'landing_key'], function () use ($router) {
+        // Datos iniciales (Planes y Selects) para pintar la Landing
+        $router->get('planes_landing', 'planes\PlanesController@index');
+        $router->get('config_inicial_trait_landing', 'traits\TraitsController@getConfigInicial');
+
+        // Validaciones del formulario de registro
+        $router->post('validar_nit_landing', 'empresas\EmpresasController@validar_nit');
+        $router->post('validar_documento_landing', 'empresas\EmpresasController@validarDocumento');
+        $router->post('validar_correo_empresa_landing', 'empresas\EmpresasController@validarCorreoEmpresa');
+        
+        // Registro de la empresa y suscripción
+        $router->post('empresa_store', 'empresas\EmpresasController@store');
+    });
 });
 
 
