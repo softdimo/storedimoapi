@@ -59,9 +59,24 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('validar_nit_landing', 'empresas\EmpresasController@validar_nit');
         $router->post('validar_documento_landing', 'empresas\EmpresasController@validarDocumento');
         $router->post('validar_correo_empresa_landing', 'empresas\EmpresasController@validarCorreoEmpresa');
+
+        // Consulta el estado de suscripción de la empresa
+        $router->get('suscripcion_edit_landing/{idSuscripcion}', 'suscripciones\SuscripcionesController@edit');
+
+        // Consulta la empresa
+        $router->get('empresa_edit_landing/{idEmpresa}', 'empresas\EmpresasController@edit');
+
+        // Estado suscripción empresa al login para Reintentar Pago
+        $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
         
-        // Registro de la empresa y suscripción
-        $router->post('empresa_store', 'empresas\EmpresasController@store');
+        // Registro de la empresa a suscribir
+        $router->post('empresa_store_landing', 'empresas\EmpresasController@store');
+
+        // Registro suscripción de la empresa
+        $router->post('suscripcion_store_landing', 'suscripciones\SuscripcionesController@store');
+
+        // Consultar empresa landing
+        $router->post('consultar_empresa_landing', 'empresas\EmpresasController@consultarEmpresa');
     });
 });
 
