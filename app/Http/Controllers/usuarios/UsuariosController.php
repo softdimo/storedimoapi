@@ -245,7 +245,11 @@ class UsuariosController extends Controller
     {
         $email = $request->input('email');
 
-        $user = Usuario::with('empresa')->where('email', $email)->first();
+        $user = Usuario::with('empresa')
+            ->leftJoin('roles', 'roles.id', '=', 'usuarios.id_rol')
+            ->where('email', $email)
+            ->first();
+
         return response()->json($user);
     }
 
