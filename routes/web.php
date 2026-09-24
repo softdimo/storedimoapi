@@ -43,8 +43,20 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Consultas y validaciones previas al login o recuperación de contraseña
     $router->group(['prefix' => 'administracion'], function () use ($router) {
         $router->post('consulta_recuperar_clave', 'usuarios\UsuariosController@consultaRecuperarClave');
-        $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
         // $router->post('cambiar_clave/{idUsuario}', 'usuarios\UsuariosController@cambiarClave');
+
+        // consultar permisos del usuario landing
+        $router->post('consultar_permisos_login', 'roles_permisos\RolesPermisosController@consultarPermisosPorUsuario');
+
+        // actualizar token sesion landing
+        $router->post('actualizar_token_sesion_login/{idUsuario}', 'usuarios\UsuariosController@actualizarTokenSesion');
+
+        // actualizar clave fallas landing
+        $router->post('actualizar_clave_fallas_login/{idUsuario}', 'usuarios\UsuariosController@actualizarClaveFallas');
+
+        $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
+
+        $router->post('inactivar_usuario_login/{idUsuario}', 'usuarios\UsuariosController@inactivarUsuario');
     });
 
     // =====================================================================
@@ -77,6 +89,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         // Consultar empresa landing
         $router->post('consultar_empresa_landing', 'empresas\EmpresasController@consultarEmpresa');
+
+        
+
+        
+
+        
     });
 });
 
@@ -105,13 +123,13 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('cambiar_clave_usuario/{idUsuario}', 'usuarios\UsuariosController@cambiarClaveUsuario');
         // $router->post('consulta_recuperar_clave', 'usuarios\UsuariosController@consultaRecuperarClave');
         $router->post('inactivar_usuario/{idUsuario}', 'usuarios\UsuariosController@inactivarUsuario');
-        $router->post('actualizar_clave_fallas/{idUsuario}', 'usuarios\UsuariosController@actualizarClaveFallas');
+        // $router->post('actualizar_clave_fallas/{idUsuario}', 'usuarios\UsuariosController@actualizarClaveFallas');
         $router->post('validar_email', 'usuarios\UsuariosController@validarEmail');
         $router->post('validar_identificacion', 'usuarios\UsuariosController@validarIdentificacion');
         // $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
         $router->get('consulta_usuario_logueado/{idUsuario}', 'usuarios\UsuariosController@consultaUsuarioLogueado');
         $router->get('consultar_session_token/{idUsuario}', 'usuarios\UsuariosController@consultarSessionToken');
-        $router->post('actualizar_token_sesion/{idUsuario}', 'usuarios\UsuariosController@actualizarTokenSesion');
+        // $router->post('actualizar_token_sesion/{idUsuario}', 'usuarios\UsuariosController@actualizarTokenSesion');
 
         // ========================================================================
 
@@ -119,7 +137,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('guardar_rol', 'roles_permisos\RolesPermisosController@crearRol');
         $router->post('guardar_permiso', 'roles_permisos\RolesPermisosController@crearPermiso');
         $router->post('crear_permiso_usuario', 'roles_permisos\RolesPermisosController@crearPermisosUsuario');
-        $router->post('consultar_permisos', 'roles_permisos\RolesPermisosController@consultarPermisosPorUsuario');
+        // $router->post('consultar_permisos', 'roles_permisos\RolesPermisosController@consultarPermisosPorUsuario');
         $router->get('permisos_por_usuario_trait/{idUsuario}', 'roles_permisos\RolesPermisosController@permisosPorUsuarioTrait');
         $router->get('permisos_trait', 'roles_permisos\RolesPermisosController@permisosTrait');
         $router->get('permisos_view_share_trait', 'roles_permisos\RolesPermisosController@permisosViewShareTrait');
@@ -146,7 +164,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('suscripcion_store', 'suscripciones\SuscripcionesController@store');
         $router->get('suscripcion_edit/{idSuscripcion}', 'suscripciones\SuscripcionesController@edit');
         $router->put('suscripcion_update/{idSuscripcion}', 'suscripciones\SuscripcionesController@update');
-        $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
+        // $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
         $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
 
         // ========================================================================
