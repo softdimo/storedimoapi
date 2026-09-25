@@ -44,7 +44,15 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'administracion'], function () use ($router) {
         $router->post('consulta_recuperar_clave', 'usuarios\UsuariosController@consultaRecuperarClave');
         // $router->post('cambiar_clave/{idUsuario}', 'usuarios\UsuariosController@cambiarClave');
+    });
 
+    // =====================================================================
+    // RUTAS LANDING PAGE (Protegidas M2M mediante LANDING_API_KEY)
+    // =====================================================================
+    $router->group(['prefix' => 'landing', 'middleware' => 'landing_key'], function () use ($router) {
+        // =====================================================================
+        // RUTAS DEL LOGIN (Protegidas M2M mediante LANDING_API_KEY)
+        // =====================================================================
         // consultar permisos del usuario landing
         $router->post('consultar_permisos_login', 'roles_permisos\RolesPermisosController@consultarPermisosPorUsuario');
 
@@ -54,15 +62,22 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         // actualizar clave fallas landing
         $router->post('actualizar_clave_fallas_login/{idUsuario}', 'usuarios\UsuariosController@actualizarClaveFallas');
 
+        // validar email login
         $router->post('validar_email_login', 'usuarios\UsuariosController@validarEmailLogin');
 
+        // inactivar usuario login
         $router->post('inactivar_usuario_login/{idUsuario}', 'usuarios\UsuariosController@inactivarUsuario');
-    });
 
-    // =====================================================================
-    // RUTAS LANDING PAGE (Protegidas M2M mediante LANDING_API_KEY)
-    // =====================================================================
-    $router->group(['prefix' => 'landing', 'middleware' => 'landing_key'], function () use ($router) {
+        // Estado suscripción empresa al login para Reintentar Pago
+        $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
+
+        // suscripción actualizar estado automático login
+        $router->post('suscripcion_actualizar_estado_automatico_login/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
+
+        // ===================================================================================================================
+        // RUTAS DEL FORMULARIO DE AUTOCREACIÓN DE CLIENTE/SUSCRIPCIÓN/PLAN (Protegidas M2M mediante LANDING_API_KEY)
+        // ===================================================================================================================
+
         // Datos iniciales (Planes y Selects) para pintar la Landing
         $router->get('planes_landing', 'planes\PlanesController@index');
         $router->get('config_inicial_trait_landing', 'traits\TraitsController@getConfigInicial');
@@ -78,9 +93,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         // Consulta la empresa
         $router->get('empresa_edit_landing/{idEmpresa}', 'empresas\EmpresasController@edit');
 
-        // Estado suscripción empresa al login para Reintentar Pago
-        $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
-        
         // Registro de la empresa a suscribir
         $router->post('empresa_store_landing', 'empresas\EmpresasController@store');
 
@@ -89,12 +101,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         // Consultar empresa landing
         $router->post('consultar_empresa_landing', 'empresas\EmpresasController@consultarEmpresa');
-
-        
-
-        
-
-        
     });
 });
 
@@ -165,7 +171,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('suscripcion_edit/{idSuscripcion}', 'suscripciones\SuscripcionesController@edit');
         $router->put('suscripcion_update/{idSuscripcion}', 'suscripciones\SuscripcionesController@update');
         // $router->get('suscripcion_empresa_estado_login/{idEmpresa}', 'suscripciones\SuscripcionesController@suscripcionEmpresaEstadoLogin');
-        $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
+        // $router->post('suscripcion_actualizar_estado_automatico/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
 
         // ========================================================================
 
