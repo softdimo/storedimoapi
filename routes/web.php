@@ -42,8 +42,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     // Consultas y validaciones previas al login o recuperación de contraseña
     $router->group(['prefix' => 'administracion'], function () use ($router) {
-        $router->post('consulta_recuperar_clave', 'usuarios\UsuariosController@consultaRecuperarClave');
-        // $router->post('cambiar_clave/{idUsuario}', 'usuarios\UsuariosController@cambiarClave');
+        
     });
 
     // =====================================================================
@@ -74,9 +73,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         // suscripción actualizar estado automático login
         $router->post('suscripcion_actualizar_estado_automatico_login/{idSuscripcion}', 'suscripciones\SuscripcionesController@suscripcionActualizarEstadoAutomatico');
 
-        // ===================================================================================================================
+        // ==========================================================================================================
         // RUTAS DEL FORMULARIO DE AUTOCREACIÓN DE CLIENTE/SUSCRIPCIÓN/PLAN (Protegidas M2M mediante LANDING_API_KEY)
-        // ===================================================================================================================
+        // ==========================================================================================================
 
         // Datos iniciales (Planes y Selects) para pintar la Landing
         $router->get('planes_landing', 'planes\PlanesController@index');
@@ -101,6 +100,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         // Consultar empresa landing
         $router->post('consultar_empresa_landing', 'empresas\EmpresasController@consultarEmpresa');
+
+        // ==========================================================================================================
+        // RECUPERAR CLAVE (Protegidas M2M mediante LANDING_API_KEY)
+        // ==========================================================================================================
+        $router->post('consulta_recuperar_clave', 'usuarios\UsuariosController@consultaRecuperarClave');
+        $router->post('cambiar_clave/{idUsuario}', 'usuarios\UsuariosController@cambiarClaveLogin');
     });
 });
 

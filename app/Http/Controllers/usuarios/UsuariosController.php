@@ -144,21 +144,21 @@ class UsuariosController extends Controller
     }
 
 
-    // public function cambiarClave(Request $request, $idUsuario)
-    // {
-    //     $claveNueva = request('clave', null);
+    public function cambiarClaveLogin(Request $request, $idUsuario)
+    {
+        $claveNueva = request('clave', null);
 
-    //     try {
-    //         Usuario::where('id_usuario',$idUsuario)
-    //             ->update([
-    //                 'clave' => Hash::make($claveNueva),
-    //         ]);
-    //         return response()->json(true);
+        try {
+            Usuario::where('id_usuario',$idUsuario)
+                ->update([
+                    'clave' => Hash::make($claveNueva),
+            ]);
+            return response()->json(true);
 
-    //     } catch (Exception $e) {
-    //         return response()->json(['error_bd' => $e->getMessage()]);
-    //     }
-    // }
+        } catch (Exception $e) {
+            return response()->json(['error_bd' => $e->getMessage()]);
+        }
+    }
 
     public function cambiarClaveUsuario(Request $request, $idUsuario)
     {
