@@ -301,15 +301,19 @@ class VentasController extends Controller
                     DB::raw("CONCAT('$', FORMAT(subtotal, 0, 'de_DE')) as subtotal_detalle"),
                     DB::raw("
                         CASE
-                            WHEN precio_detal_venta IS NOT NULL THEN precio_detal_venta
-                            ELSE CONCAT(precio_x_mayor_venta)
+                            WHEN precio_unitario_venta IS NOT NULL AND precio_unitario_venta > 0 THEN precio_unitario_venta
+                            WHEN precio_detal_venta IS NOT NULL AND precio_detal_venta > 0 THEN precio_detal_venta
+                            WHEN precio_x_mayor_venta IS NOT NULL AND precio_x_mayor_venta > 0 THEN precio_x_mayor_venta
+                            ELSE COALESCE(precio_unitario_venta, precio_detal_venta, precio_x_mayor_venta, 0)
                         END AS precio_venta
                     "),
                     DB::raw("
                         CONCAT('$', FORMAT(
                             CASE
-                                WHEN precio_detal_venta IS NOT NULL THEN precio_detal_venta
-                                ELSE precio_x_mayor_venta
+                                WHEN precio_unitario_venta IS NOT NULL AND precio_unitario_venta > 0 THEN precio_unitario_venta
+                                WHEN precio_detal_venta IS NOT NULL AND precio_detal_venta > 0 THEN precio_detal_venta
+                                WHEN precio_x_mayor_venta IS NOT NULL AND precio_x_mayor_venta > 0 THEN precio_x_mayor_venta
+                                ELSE COALESCE(precio_unitario_venta, precio_detal_venta, precio_x_mayor_venta, 0)
                             END
                         , 0, 'de_DE')) as precio_venta_detalle
                     "),
