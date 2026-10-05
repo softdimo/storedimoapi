@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Suscripcion;
 use App\Models\Empresa;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-// use Illuminate\Support\Facades\Http;
 
 class WompiWebhookController extends Controller
 {
@@ -114,29 +114,74 @@ class WompiWebhookController extends Controller
 
             // ======================================================================
             // NOTIFICAR A LA APP WEB PARA DISPARAR CORREOS
+            // Enviamos empresa/suscripción en el payload para que la App NO tenga
+            // que volver a llamar a la API (evita fallos por JWT/landing_key/timeouts).
             // ======================================================================
             if ($notificarCambioApp) {
                 try {
-                    // Url de tu Landing/App Web (ej: https://storedimoapp.com/api/wompi-notificar-correo)
-                    $urlAppWeb = config('services.app_web.url') . '/api/wompi-notificar-correo';
+                    $urlAppWeb = rtrim((string) config('services.app_web.url'), '/') . '/api/wompi-notificar-correo';
 
-                    $client = new \GuzzleHttp\Client();
-                    $client->post($urlAppWeb, [
+                    $client = new \GuzzleHttp\Client([
+                        'timeout'         => 30,
+                        'connect_timeout' => 10,
+                        'http_errors'     => false,
+                    ]);
+
+                    // Datos enriquecidos para las plantillas de correo (sin que la App vuelva a consultar)
+                    $suscripcionMail = DB::connection('mysql')
+                        ->table('suscripciones')
+                        ->leftJoin('planes', 'planes.id_plan', '=', 'suscripciones.id_plan_suscrito')
+                        ->leftJoin('tipos_pago', 'tipos_pago.id_tipo_pago', '=', 'suscripciones.id_tipo_pago_suscripcion')
+                        ->where('suscripciones.id_suscripcion', $idSuscripcion)
+                        ->select(
+                            'suscripciones.id_suscripcion',
+                            'suscripciones.id_empresa_suscrita',
+                            'suscripciones.id_plan_suscrito',
+                            'planes.nombre_plan',
+                            'tipos_pago.tipo_pago as modalidad_suscripcion',
+                            'suscripciones.valor_suscripcion',
+                            'suscripciones.fecha_inicial',
+                            'suscripciones.fecha_final',
+                            'suscripciones.id_estado_suscripcion',
+                            'suscripciones.id_tipo_pago_suscripcion',
+                            'suscripciones.observaciones_suscripcion'
+                        )
+                        ->first();
+
+                    $responseMail = $client->post($urlAppWeb, [
                         'headers' => [
                             'X-Storedimo-Token' => config('services.app_web.internal_token'),
+                            'Accept'            => 'application/json',
                             'Content-Type'      => 'application/json',
                         ],
                         'json' => [
                             'id_suscripcion' => $idSuscripcion,
                             'id_transaccion' => $idTransaccion,
-                            'estado_wompi'   => $statusWompi
-                        ]
+                            'estado_wompi'   => $statusWompi,
+                            'empresa'        => $empresa ? [
+                                'id_empresa'             => $empresa->id_empresa,
+                                'nombre_empresa'         => $empresa->nombre_empresa,
+                                'email_empresa'          => $empresa->email_empresa,
+                                'celular_empresa'        => $empresa->celular_empresa,
+                                'direccion_empresa'      => $empresa->direccion_empresa,
+                                'nit_empresa'            => $empresa->nit_empresa,
+                                'ident_empresa_natural'  => $empresa->ident_empresa_natural,
+                            ] : null,
+                            'suscripcion'    => $suscripcionMail,
+                        ],
                     ]);
-                    
-                    Log::info("Notificación de correo enviada a la App Web para la suscripción: " . $idSuscripcion);
+
+                    $statusCode = $responseMail->getStatusCode();
+                    $bodyMail   = (string) $responseMail->getBody();
+
+                    if ($statusCode >= 200 && $statusCode < 300) {
+                        Log::info("Notificación de correo OK a App Web. Suscripción: {$idSuscripcion}. HTTP {$statusCode}");
+                    } else {
+                        Log::error("App Web respondió error al notificar correo. Suscripción: {$idSuscripcion}. HTTP {$statusCode}. Body: {$bodyMail}");
+                    }
 
                 } catch (Exception $eMail) {
-                    // Capturamos el error por si la App Web está caída, para que no rompa el webhook de Wompi (200)
+                    // No romper el webhook de Wompi (siempre 200 si el negocio ya se procesó)
                     Log::error('No se pudo comunicar con la App Web para enviar el correo: ' . $eMail->getMessage());
                 }
             }
