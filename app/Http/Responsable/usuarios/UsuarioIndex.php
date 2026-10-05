@@ -101,17 +101,6 @@ class UsuarioIndex implements Responsable
                 $usuario->tipo_persona = $tipoPersona[$usuario->id_tipo_persona]->tipo_persona ?? 'Sin Tipo Persona';
             }
 
-            // 3. Agregar nombre completo del usuario desde la base principal
-            // foreach ($usuarios as $usuario) {
-            //     $tipoDocumento = DB::connection('mysql') // o la conexión principal que uses
-            //         ->table('tipo_documento')
-            //         ->where('id_tipo_documento', $usuario->id_tipo_documento)
-            //         ->select('tipo_documento')
-            //         ->first();
-
-            //     $usuario->tipo_documento = $tipoDocumento->tipo_documento ?? 'Sin Tipo de Documento';
-            // }
-
             return response()->json($usuarios);
             
         } catch (Exception $e) {
