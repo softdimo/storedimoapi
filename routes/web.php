@@ -204,6 +204,12 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('query_rutas_utilizadas', 'metricas\MetricasController@queryRutasUtilizadas');
         $router->post('query_actividad_horas', 'metricas\MetricasController@queryActividadHoras');
         $router->post('borrar_registros', 'metricas\MetricasController@borrarRegistros');
+        
+        // ========================================================================
+
+        // AUDITORIAS
+        $router->get('auditoria_index', 'auditorias\AuditoriasController@index');
+
     }); // FIN api/administracion
 
     // ========================================================================

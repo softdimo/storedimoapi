@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 use App\Models\Roles;
 use App\Models\Permission;
 use App\Models\ModelHasPermissions;
+use Illuminate\Support\Facades\DB;
 
 class RolesPermisosStore implements Responsable
 {
@@ -79,27 +80,27 @@ class RolesPermisosStore implements Responsable
         try
         {
             $usuarioId = $request->usuario_id;
-            $nuevosPermisos = $request->permissions ?? [];
+            $nuevosPermisos = array_values(array_unique(array_filter((array) ($request->permissions ?? []))));
+            $modelType = 'App\Models\Usuario';
 
-            // Eliminar permisos actuales
-            $permisosActuales = $this->consultarPermisosPorUsuario($usuarioId);
-            if ($permisosActuales->isNotEmpty())
-            {
-                $permissionIds = $permisosActuales->pluck('permission_id');
-                ModelHasPermissions::where('model_id', $usuarioId)
-                                   ->whereIn('permission_id', $permissionIds)
-                                   ->delete();
-            }
-
-            // Asignar nuevos permisos
-            foreach ($nuevosPermisos as $permissionId)
-            {
-                ModelHasPermissions::updateOrCreate([
+            $filas = [];
+            foreach ($nuevosPermisos as $permissionId) {
+                $filas[] = [
                     'permission_id' => $permissionId,
-                    'model_type' => 'App\Models\Usuario',
-                    'model_id' => $usuarioId
-                ]);
+                    'model_type' => $modelType,
+                    'model_id' => $usuarioId,
+                ];
             }
+
+            DB::connection('mysql')->transaction(function () use ($usuarioId, $modelType, $filas) {
+                ModelHasPermissions::where('model_id', $usuarioId)
+                    ->where('model_type', $modelType)
+                    ->delete();
+
+                if (!empty($filas)) {
+                    ModelHasPermissions::insert($filas);
+                }
+            });
 
             return response()->json([
                 'success' => true,
