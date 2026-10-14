@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use App\Models\ModelHasPermissions;
+use App\Models\Permission;
 use App\Models\Empresa;
 class UsuarioStore implements Responsable
 {
@@ -32,54 +33,62 @@ class UsuarioStore implements Responsable
         $claveFallas = request('clave_fallas', null);
         $idEmpresa = request('id_empresa', null);
         $correoEmpresa = null;
+        $consultaUsuario = null;
+        $datosEmpresa = null;
 
         // Consultamos si existe usuario administrador para la nueva empresa
-        if($idRol == 1)
-        {
+        if($idRol == 1) {
             $consultaUsuario = Usuario::where('id_rol', $idRol)
                                 ->where('id_empresa', $idEmpresa) 
                                 ->first(); 
         }
 
         $nuevoUsuario = Usuario::create([
-            'nombre_usuario' => ucwords($nombreUsuario),
-            'apellido_usuario' => ucwords($apellidoUsuario),
-            'id_tipo_documento' => $idTipoDocumento,
-            'identificacion' => $identificacion,
-            'usuario' => $usuario,
-            'email' => $email,
-            'clave' => $clave,
-            'clave_fallas' => $claveFallas,
-            'id_estado' => $idEstado,
-            'id_rol' => $idRol,
-            'id_tipo_persona' => $idTipoPersona,
-            'numero_telefono' => $numeroTelefono,
-            'celular' => $celular,
-            'id_genero' => $idGenero,
-            'direccion' => $direccion,
-            'fecha_contrato' => $fechaContrato,
+            'nombre_usuario'             => ucwords($nombreUsuario),
+            'apellido_usuario'           => ucwords($apellidoUsuario),
+            'id_tipo_documento'          => $idTipoDocumento,
+            'identificacion'             => $identificacion,
+            'usuario'                    => $usuario,
+            'email'                      => $email,
+            'clave'                      => $clave,
+            'clave_fallas'               => $claveFallas,
+            'id_estado'                  => $idEstado,
+            'id_rol'                     => $idRol,
+            'id_tipo_persona'            => $idTipoPersona,
+            'numero_telefono'            => $numeroTelefono,
+            'celular'                    => $celular,
+            'id_genero'                  => $idGenero,
+            'direccion'                  => $direccion,
+            'fecha_contrato'             => $fechaContrato,
             'fecha_terminacion_contrato' => $fechaTerminacionContrato,
-            'id_empresa' => $idEmpresa,
+            'id_empresa'                 => $idEmpresa,
         ]);
 
-        if (isset($nuevoUsuario) && !is_null($nuevoUsuario) && !empty($nuevoUsuario))
-        {
+        if (isset($nuevoUsuario) && !is_null($nuevoUsuario) && !empty($nuevoUsuario)) {
             // Enviamos correo si NO se encuentra ningún usuario administrador para la nueva empresa
-            if(!isset($consultaUsuario) && (is_null($consultaUsuario) || empty($consultaUsuario)))
-            {
+            if ($idRol == 1 && is_null($consultaUsuario)) {
                 $datosEmpresa = Empresa::select('email_empresa')
-                                ->where('id_empresa', $idEmpresa)
-                                ->where('id_estado', 1)
-                                ->first();
+                    ->where('id_empresa', $idEmpresa)
+                    ->where('id_estado', 1)
+                    ->first();
             }
+
+
+            // if(!isset($consultaUsuario) && (is_null($consultaUsuario) || empty($consultaUsuario))) {
+            //     $datosEmpresa = Empresa::select('email_empresa')
+            //                     ->where('id_empresa', $idEmpresa)
+            //                     ->where('id_estado', 1)
+            //                     ->first();
+            // }
 
             $this->asignarPermisosPorRol($idRol, $nuevoUsuario);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Usuario creado correctamente',
-                'usuario' => $nuevoUsuario,
-                'correo_empresa' => $datosEmpresa->email_empresa
+                'success'        => true,
+                'message'        => 'Usuario creado correctamente',
+                'usuario'        => $nuevoUsuario,
+                'correo_empresa' => $datosEmpresa->email_empresa ?? null,
+                // 'correo_empresa' => $datosEmpresa->email_empresa
             ]);
         } else {
             return abort(404, 'No existe este usuario');
@@ -99,8 +108,8 @@ class UsuarioStore implements Responsable
         ];
 
         $tipoPermiso = $mapaRolesPermisos[$idRol] ?? 'Consulta';
-        $metodo = 'permisos' . $tipoPermiso;
-        $permisos = method_exists($this, $metodo) ? $this->$metodo() : [];
+        $metodo      = 'permisos' . $tipoPermiso;
+        $permisos    = method_exists($this, $metodo) ? $this->$metodo() : [];
 
         $usuario = Usuario::where('identificacion', $nuevoUsuario->identificacion)->first();
 
@@ -109,18 +118,39 @@ class UsuarioStore implements Responsable
                             ->where('model_type', Usuario::class)
                             ->delete();
 
-        if($idRol != 8)
-        {
-            // Asignar nuevos permisos
-            foreach ($permisos as $permissionId)
-            {
-                ModelHasPermissions::create([
+        // $permisos = DB::table('permissions')
+        //     ->whereIn('id', $permisos)
+        //     ->pluck('id')
+        //     ->all();
+
+        $permisos = Permission::whereIn('id', $permisos)->pluck('id')->all();
+
+        if ($idRol != 8 && !empty($permisos)) {
+            $filas = [];
+        
+            foreach ($permisos as $permissionId) {
+                $filas[] = [
                     'permission_id' => $permissionId,
-                    'model_type' => Usuario::class,
-                    'model_id' => $usuario->id_usuario
-                ]);
+                    'model_type'    => Usuario::class,
+                    'model_id'      => $usuario->id_usuario,
+                ];
             }
+        
+            ModelHasPermissions::insert($filas);
         }
+
+        // if($idRol != 8)
+        // {
+        //     // Asignar nuevos permisos
+        //     foreach ($permisos as $permissionId)
+        //     {
+        //         ModelHasPermissions::create([
+        //             'permission_id' => $permissionId,
+        //             'model_type' => Usuario::class,
+        //             'model_id' => $usuario->id_usuario
+        //         ]);
+        //     }
+        // }
     }
 
     private function permisosSoftdimo()
