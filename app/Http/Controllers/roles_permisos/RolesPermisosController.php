@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Responsable\roles_permisos\RolesPermisosStore;
 use App\Http\Responsable\roles_permisos\RolesPermisosShow;
-use App\Http\Responsable\roles_permisos\RolesPermisosDestroy;
+// use App\Http\Responsable\roles_permisos\RolesPermisosDestroy; // NO EXISTE ESTA CLASE
 use App\Models\ModelHasPermissions;
 use App\Models\Permission;
 
@@ -36,7 +36,7 @@ class RolesPermisosController extends Controller
 
     function eliminarPermisosPorUsuario(Request $request)
     {
-        return new RolesPermisosDestroy();
+        // return new RolesPermisosDestroy();  // NO EXISTE ESTA CLASE
     }
 
     function permisosPorUsuarioTrait($idUsuario)
