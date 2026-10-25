@@ -5,7 +5,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.3.0",
+        "php": "^8.3.36",
         "flipbox/lumen-generator": "^9.2",
         "guzzlehttp/guzzle": "^7.11",
         "laravel/lumen-framework": "^9.0",
@@ -39,7 +39,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.3.0"
+            "php": "8.3.36"
         }
     },
     "minimum-stability": "dev",
