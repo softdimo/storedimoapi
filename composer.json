@@ -5,17 +5,17 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.3.36",
-        "flipbox/lumen-generator": "^9.2",
+        "php": "^8.4.27",
+        "flipbox/lumen-generator": "^9.3",
         "guzzlehttp/guzzle": "^7.11",
-        "laravel/lumen-framework": "^9.0",
+        "laravel/lumen-framework": "^11.2",
         "owen-it/laravel-auditing": "^13.7",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.9.1",
-        "mockery/mockery": "^1.4.4",
-        "phpunit/phpunit": "^9.5.10"
+        "fakerphp/faker": "^1.23",
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^10.5"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +39,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.3.36"
+            "php": "8.4.27"
         }
     },
     "minimum-stability": "dev",
