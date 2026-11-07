@@ -9,6 +9,8 @@ use App\Http\Responsable\planes\PlanIndex;
 use App\Http\Responsable\planes\PlanStore;
 use App\Http\Responsable\planes\PlanEdit;
 use App\Http\Responsable\planes\PlanUpdate;
+use App\Http\Responsable\planes\PlanesConSuscripcionActiva;
+use App\Http\Responsable\planes\PlanTieneSuscripcionActiva;
 use App\Models\Plan;
 
 class PlanesController extends Controller
@@ -106,5 +108,21 @@ class PlanesController extends Controller
     public function destroy($idProducto)
     {
         //
+    }
+
+    // ======================================================================
+    // ======================================================================
+
+    public function planesConSuscripcionActiva()
+    {
+        return new PlanesConSuscripcionActiva();
+    }
+
+    // ======================================================================
+    // ======================================================================
+
+    public function planTieneSuscripcionActiva($idPlan)
+    {
+        return new PlanTieneSuscripcionActiva($idPlan);
     }
 }

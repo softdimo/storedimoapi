@@ -185,6 +185,8 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('plan_store', 'planes\PlanesController@store');
         $router->get('plan_edit/{idPlan}', 'planes\PlanesController@edit');
         $router->put('plan_update/{idPlan}', 'planes\PlanesController@update');
+        $router->get('planes_con_suscripcion_activa', 'planes\PlanesController@planesConSuscripcionActiva');
+        $router->get('plan_tiene_suscripcion_activa/{idPlan}', 'planes\PlanesController@planTieneSuscripcionActiva');
 
         // TRAITS
         $router->get('config_inicial_trait', 'traits\TraitsController@getConfigInicial');
